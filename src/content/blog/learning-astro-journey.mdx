@@ -1,0 +1,290 @@
+---
+title: "How I Learned Astro: A Journey from Zero to Portfolio"
+description: "My personal story about discovering Astro, the mistakes I made, the surprises I encountered, and everything I learned while building this site from scratch"
+publishDate: 2026-01-09
+tags: ["astro", "learning", "web development", "personal journey"]
+draft: false
+---
+
+# From Confusion to Clarity: My Astro Learning Journey
+
+I didn't start this project knowing what I was doing. Honestly, I began with a simple question: **"How do I create an online CV that doesn't look like a PDF rendered in a browser?"**
+
+What followed was a learning adventure that fundamentally changed how I think about web development, static site generation, and the balance between simplicity and power.
+
+This isn't a tutorial. This is the story of my journey — the confusion, the frustration, the "aha" moments, and ultimately, the satisfaction of creating something I'm genuinely proud of.
+
+---
+
+## The Decision: Why Astro?
+
+Before diving into Astro, I spent considerable time researching different options. I looked at Next.js, Gatsby, Hugo, Jekyll, and even plain HTML/CSS. Each had its merits, but something about Astro immediately caught my attention.
+
+The promise was compelling: **"Ship less JavaScript, build faster websites."** As someone who had experienced the bloat of modern JavaScript frameworks firsthand, this resonated deeply with me. I was tired of loading 500KB of JavaScript just to render a static page.
+
+But I won't lie — I was also skeptical. Every framework promises performance. Every framework claims to be developer-friendly. I've been burned before by technologies that looked great in demos but fell apart in real-world usage.
+
+So I made a decision: I would learn Astro by building something real. Not a todo app. Not a counter. A full portfolio website that I would actually use and maintain.
+
+---
+
+## First Impressions: "Wait, This Isn't React?"
+
+When I opened my first `.astro` file, confusion immediately set in. The code looked familiar — it was JSX-like, but also... not quite. There was HTML, there was JavaScript, but everything was arranged differently than anything I had seen before.
+
+```astro
+---
+// Is this JavaScript? In front matter? What's happening here?
+const name = "Bogdan";
+const skills = ["UiPath", "TypeScript", "REST APIs"];
+---
+
+<div>
+  <h1>Hello, {name}!</h1>
+  <ul>
+    {skills.map(skill => <li>{skill}</li>)}
+  </ul>
+</div>
+```
+
+I stared at this for longer than I'd like to admit. Where does the JavaScript end and the HTML begin? Why are there three dashes? Where's the export default? Where's the component function?
+
+**The first crucial lesson hit me hard:** Astro is not React. It's not Vue. It's not Svelte. It's its own paradigm, and I needed to approach it with fresh eyes rather than trying to map it onto existing mental models.
+
+That section between the `---` markers is called the **component script** or **front matter**. It runs at build time, not in the browser. This single concept took me days to fully internalize, but once it clicked, everything started making sense.
+
+The implication? Any JavaScript you write there runs on your computer during the build process. The user never downloads that code. They only receive the final HTML output. This is fundamentally different from React, where everything typically runs in the browser.
+
+---
+
+## The Mistake That Taught Me the Most
+
+I'll be honest about my biggest failure during this learning process, because it taught me more than any documentation could.
+
+I spent an embarrassingly long time trying to make a simple interactive button work. I wrote the code, refreshed the page, and... nothing happened. No error messages. No console logs. Just silence.
+
+```astro
+<!-- This didn't work! But why?! -->
+<button onclick="console.log('clicked')">Click me</button>
+```
+
+I checked the syntax. I cleared the cache. I restarted the dev server. I even reinstalled dependencies. Nothing worked.
+
+After hours of frustrated debugging — and I mean actual hours — I finally discovered the truth: **Astro ships zero JavaScript to the browser by default**.
+
+Everything is static. No JS. None. Nada.
+
+When this realization hit me, I had two simultaneous reactions. First, frustration at the time I'd wasted. Second, a profound appreciation for why Astro is so incredibly fast. Of course it's fast — it's not sending any JavaScript!
+
+But this meant I needed to think differently about interactivity. For truly interactive components, Astro provides **client directives**:
+
+```astro
+---
+import InteractiveCounter from '../components/Counter.jsx';
+---
+
+<!-- Now this actually works! -->
+<InteractiveCounter client:load />
+```
+
+The `client:load` directive tells Astro: "Hey, this component needs JavaScript. Please hydrate it when the page loads." There are other options too — `client:visible` for lazy loading, `client:idle` for deferring until the main thread is idle, and more.
+
+**The lesson I took away:** Don't assume you understand how something works just because the syntax looks familiar. Read the documentation. Understand the mental model. The extra time invested upfront saves exponentially more time later.
+
+---
+
+## Content Collections: The "WOW" Moment
+
+If I had to choose one single feature that made me fall in love with Astro, it would be **Content Collections**.
+
+Before discovering this feature, organizing content was a nightmare for me. I had markdown files scattered everywhere, with inconsistent frontmatter structures, typos in property names that only surfaced as runtime bugs, and no reliable way to query or filter content.
+
+Then I discovered that Astro lets you define a schema for your content:
+
+```typescript
+// src/content/config.ts
+import { defineCollection, z } from 'astro:content';
+
+const blogCollection = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    publishDate: z.date(),
+    tags: z.array(z.string()),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = {
+  blog: blogCollection,
+};
+```
+
+This changed everything for me. Now TypeScript immediately tells me when I've mistyped a property name. Autocomplete works perfectly in my editor. If I forget a required field, the build fails with a clear error message pointing exactly to the problem.
+
+I remember the first time I made a typo in a blog post's frontmatter and Astro caught it during build. I literally said "wow" out loud. For someone who had spent countless hours debugging missing or misspelled properties in other systems, this felt like magic.
+
+**What I learned:** A bit of upfront setup saves hours of debugging later. The investment in type safety is always worth it. Always.
+
+---
+
+## Things That Pleasantly Surprised Me
+
+### 1. Build Speed
+
+Coming from other frameworks, I was accustomed to build times of 2-3 minutes for medium-sized projects. Complex projects could take even longer. I would start a build, go make coffee, and maybe come back just in time to see it finish.
+
+Astro? A few seconds. Literally seconds.
+
+My entire portfolio builds in under 5 seconds. The development server starts almost instantly. Hot module replacement is so fast that I sometimes don't even notice the page refreshing.
+
+This might seem like a small thing, but it fundamentally changes how you work. When builds are fast, you experiment more. You try things. You iterate quickly. When builds are slow, you batch changes and test less frequently. Fast feedback loops make better developers.
+
+### 2. Framework Flexibility
+
+Here's something that blew my mind: Astro lets you use components from React, Vue, Svelte, Solid, or Preact — all in the same project. You can even mix them on the same page.
+
+I haven't fully utilized this capability yet, but knowing it exists is incredibly reassuring. If I ever need to use a specific React component library, I can. If a perfect Vue component exists for some functionality, I can use that too.
+
+This "bring your own UI framework" approach means Astro isn't trying to lock you into its ecosystem. It's genuinely framework-agnostic while still providing excellent defaults.
+
+### 3. Documentation Quality
+
+I've read a lot of technical documentation in my career. Most of it ranges from "barely adequate" to "actively misleading." Astro's documentation is genuinely excellent.
+
+The [Astro docs](https://docs.astro.build) are clear, comprehensive, full of practical examples, and kept remarkably up-to-date. When new features launch, the docs are already there. The structure makes sense. The search works well.
+
+I learned probably 60% of what I know about Astro directly from the official documentation. That's rare and valuable.
+
+### 4. Community Support
+
+When I got stuck on problems that documentation couldn't solve, the community came through. The Astro Discord server is active, welcoming to newcomers, and filled with people who genuinely want to help.
+
+I asked what I thought were dumb questions and received patient, helpful answers. Nobody made me feel bad for not understanding something. That kind of welcoming community makes an enormous difference when you're learning.
+
+---
+
+## The Styling Journey: Finding My Approach
+
+One aspect I haven't mentioned yet is CSS. Astro gives you multiple options: vanilla CSS, CSS modules, Sass, Tailwind, and more. I deliberately chose vanilla CSS for this project, and here's why.
+
+I wanted to understand exactly what was happening with my styles. When something looked wrong, I wanted to know precisely which CSS rule was responsible. CSS-in-JS solutions and utility frameworks are powerful, but they add abstraction layers that can make debugging harder.
+
+Using vanilla CSS in Astro's scoped style blocks turned out to be delightful:
+
+```astro
+<style>
+  .card {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+  }
+</style>
+```
+
+These styles are automatically scoped to the component. No class name collisions. No global pollution. I get the simplicity of writing regular CSS with the safety of component-level scoping.
+
+I also established a system of CSS custom properties for my design tokens. Colors, spacing, typography — all defined centrally and referenced throughout. This made maintaining visual consistency straightforward and made later refinements much easier.
+
+---
+
+## What I Would Do Differently
+
+Looking back on this learning journey, several things stand out as areas where I could have been smarter:
+
+### 1. Read Documentation More Thoroughly First
+
+I have a bad habit of skimming docs and jumping straight into code. "I'll figure it out as I go," I tell myself. This approach sometimes works for technologies similar to ones I already know.
+
+For Astro, this was a mistake. Key concepts like the component script, client directives, and Content Collections are fundamental. Skipping past them in the docs meant I had to learn them the hard way through debugging and frustration.
+
+If I were starting over, I would read the entire "Getting Started" section carefully before writing any code.
+
+### 2. Use TypeScript from Day One
+
+I started this project with JavaScript and added TypeScript later. This was painful. Retrofitting types onto existing code is significantly harder than writing with types from the beginning.
+
+TypeScript catches so many errors early. Missing properties. Type mismatches. Undefined values. These bugs are annoying to track down at runtime but trivially caught by the compiler.
+
+Start with TypeScript. Stay with TypeScript. Your future self will thank your present self.
+
+### 3. Experiment in Isolation
+
+When I wanted to try something new, I often tried it directly in my main project. If it broke something, I'd have to untangle the mess. This slowed me down and introduced unnecessary stress.
+
+A better approach: maintain a separate sandbox project or folder for experiments. Try new ideas there. Once they work, integrate them into the main project. Cleaner, faster, less risky.
+
+### 4. Commit More Frequently
+
+I sometimes went too long between git commits, making large changes before saving my progress. When something broke, I had to backtrack through a lot of modified files.
+
+Small, focused commits with clear messages make debugging easier and provide natural save points to return to if needed.
+
+---
+
+## What I Discovered About Myself as a Developer
+
+Building this portfolio taught me more than just Astro. It taught me several things about how I learn and work:
+
+**It's okay not to know things.** Nobody knows everything. Asking questions isn't weakness — it's efficiency. The time I spent trying to figure out problems alone could have been saved with a simple question in the community Discord.
+
+**Documentation is your friend.** I used to view reading docs as admitting I couldn't figure something out on my own. That's absurd. Good developers use good resources. The docs exist specifically to help. Use them.
+
+**Mistakes are teachers.** Every bug I encountered taught me something. Every error message, once understood, added to my mental model of how things work. Frustration is temporary; understanding is permanent.
+
+**Simplicity is hard to achieve.** Astro seems simple on the surface, but that simplicity is the result of many careful design decisions. Creating something that appears simple while handling complex scenarios underneath is genuinely difficult. I have new appreciation for framework designers.
+
+**Side projects are essential for growth.** Working on a personal project let me explore at my own pace, make mistakes without pressure, and learn things that my day job wouldn't expose me to. This portfolio directly improved my professional skills in ways I didn't anticipate.
+
+---
+
+## Advice for Those Starting Their Astro Journey
+
+If you're at the beginning of your own Astro learning journey, here's what I'd tell you:
+
+### 1. Don't Compare with React/Vue/etc.
+
+Astro is different. Let it be different. The temptation to think "in React, I would do X" is strong, but it leads you astray. Astro has its own patterns, and fighting them leads to frustration.
+
+### 2. Start with a Small, Real Project
+
+Blog. Portfolio. Landing page. Something small but real that you'll actually finish and potentially use. Tutorial projects often feel incomplete because they are — they're designed to demonstrate features, not to be used. Building something you care about provides motivation to push through difficult moments.
+
+### 3. Use Content Collections Even for Small Sites
+
+Even if you only have two blog posts. Even if you think "I don't need all this structure." Set up Content Collections anyway. The type safety and query capabilities feel like overkill until you've been saved by them once. Then they feel essential.
+
+### 4. Understand Client Directives Early
+
+The interactivity model is the area where most newcomers get confused. Invest time understanding when and why you need JavaScript in the browser. Experiment with `client:load`, `client:visible`, `client:idle`, and others. Know your options.
+
+### 5. Read Source Code of Good Projects
+
+I learned a lot by looking at how others structured their Astro projects. The official themes and templates are excellent references. GitHub is full of open-source Astro sites. Study them. See how others organized their components, handled common patterns, implemented specific features.
+
+### 6. Join the Community
+
+The Astro Discord is welcoming. The GitHub discussions are helpful. Stack Overflow has a growing collection of Astro questions and answers. You're not alone in learning this. There's a whole community of people who've faced the same challenges and are happy to help.
+
+---
+
+## Conclusion: More Than Just a Website
+
+This portfolio is more than just a website. It's proof that I learned something new. It's a collection of lessons, mistakes, and small victories. It's a tangible result of time invested in growth.
+
+Astro taught me that web development doesn't have to be complicated. That performance can be a default rather than an afterthought. That simplicity, when done right, is a genuine superpower.
+
+The zero-JavaScript-by-default philosophy seemed limiting at first. Now I see it as liberating. It forced me to think carefully about what truly needs client-side interactivity versus what can be static. Most things, it turns out, can be static.
+
+If you're considering learning Astro, do it. The learning curve is gentler than other modern frameworks. The performance benefits are real and measurable. The community is supportive. The documentation is excellent.
+
+And if you have questions along the way, reach out. I've been where you are now, and I remember how much it meant when someone took the time to help.
+
+Building this portfolio was one of the best learning experiences I've had in recent years. Not just for the technical skills, but for the reminder that starting something new, feeling confused, pushing through frustration, and eventually achieving understanding — that cycle never gets old.
+
+It's why I became a developer in the first place.
+
+---
+
+*This is the first article in a series about my learning experiences. Next up: TypeScript — why I avoided it for too long and what finally convinced me to embrace it.*

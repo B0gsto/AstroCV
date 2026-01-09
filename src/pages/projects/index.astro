@@ -1,0 +1,98 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectCard from '../../components/projects/ProjectCard.astro';
+import { getCollection } from 'astro:content';
+
+const projects = await getCollection('projects');
+const featuredProjects = projects.filter((p) => p.data.featured);
+const otherProjects = projects.filter((p) => !p.data.featured);
+const sortedProjects = [...featuredProjects, ...otherProjects].sort(
+  (a, b) => b.data.completedDate.valueOf() - a.data.completedDate.valueOf()
+);
+---
+
+<BaseLayout title="Projects - Bogdan Stoica" description="Personal projects and open source contributions">
+  <div class="container">
+    <header class="page-header animate-fade-in-up">
+      <h1>Projects</h1>
+      <p class="page-description">
+        A collection of personal projects and open source contributions
+      </p>
+    </header>
+    
+    {sortedProjects.length === 0 ? (
+      <div class="empty-state">
+        <p>No projects yet. Working on something new!</p>
+      </div>
+    ) : (
+      <div class="projects-grid">
+        {sortedProjects.map((project, index) => (
+          <div class={`stagger-${Math.min(index + 1, 6)}`}>
+            <ProjectCard
+              title={project.data.title}
+              description={project.data.description}
+              technologies={project.data.technologies}
+              slug={project.slug}
+              githubUrl={project.data.githubUrl}
+              liveUrl={project.data.liveUrl}
+              coverImage={project.data.coverImage}
+              featured={project.data.featured}
+            />
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .page-header {
+    text-align: center;
+    margin-bottom: var(--space-16);
+  }
+  
+  .page-header h1 {
+    margin-bottom: var(--space-4);
+  }
+  
+  .page-description {
+    font-size: var(--text-lg);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: var(--space-8);
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: var(--space-16);
+    color: var(--color-text-muted);
+  }
+  
+  .stagger-1, .stagger-2, .stagger-3, .stagger-4, .stagger-5, .stagger-6 {
+    opacity: 0;
+    animation: fadeInUp 0.5s ease forwards;
+  }
+  
+  .stagger-1 { animation-delay: 0.1s; }
+  .stagger-2 { animation-delay: 0.2s; }
+  .stagger-3 { animation-delay: 0.3s; }
+  .stagger-4 { animation-delay: 0.4s; }
+  .stagger-5 { animation-delay: 0.5s; }
+  .stagger-6 { animation-delay: 0.6s; }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

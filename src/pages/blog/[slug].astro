@@ -1,0 +1,203 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+const formattedDate = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+}).format(post.data.publishDate);
+---
+
+<BaseLayout
+  title={`${post.data.title} - Blog`}
+  description={post.data.description}
+>
+  <article class="container blog-post">
+    <header class="post-header animate-fade-in-up">
+      <a href="/blog" class="back-link">Back to blog</a>
+
+      <div class="post-meta">
+        <time datetime={post.data.publishDate.toISOString()}
+          >{formattedDate}</time
+        >
+        <span class="separator">-</span>
+        <span>5 min read</span>
+      </div>
+
+      <h1>{post.data.title}</h1>
+      <p class="post-description">{post.data.description}</p>
+
+      <div class="post-tags">
+        {post.data.tags.map((tag: string) => <span class="tag">{tag}</span>)}
+      </div>
+    </header>
+
+    {
+      post.data.coverImage && (
+        <div class="post-cover">
+          <img src={post.data.coverImage} alt={post.data.title} />
+        </div>
+      )
+    }
+
+    <div class="post-content prose">
+      <Content />
+    </div>
+
+    <footer class="post-footer">
+      <div class="share-section">
+        <p>Enjoyed this article?</p>
+        <a href="/blog" class="btn btn-secondary">Read more</a>
+      </div>
+    </footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .blog-post {
+    max-width: 1000px;
+  }
+
+  .post-header {
+    text-align: center;
+    margin-bottom: var(--space-12);
+  }
+
+  .back-link {
+    display: inline-block;
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--space-8);
+    transition: color var(--transition-fast);
+  }
+
+  .back-link:hover {
+    color: var(--color-primary);
+  }
+
+  .post-meta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+  }
+
+  .separator {
+    color: var(--color-border);
+  }
+
+  .post-header h1 {
+    font-size: var(--text-4xl);
+    margin-bottom: var(--space-4);
+  }
+
+  .post-description {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    max-width: 600px;
+    margin: 0 auto var(--space-6);
+  }
+
+  .post-tags {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .post-cover {
+    margin-bottom: var(--space-12);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+  }
+
+  .post-cover img {
+    width: 100%;
+    height: auto;
+  }
+
+  /* Prose styles */
+  .post-content {
+    line-height: var(--line-height-relaxed);
+  }
+
+  .post-content :global(h2) {
+    font-size: var(--text-2xl);
+    margin-top: var(--space-12);
+    margin-bottom: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .post-content :global(h3) {
+    font-size: var(--text-xl);
+    margin-top: var(--space-8);
+    margin-bottom: var(--space-3);
+  }
+
+  .post-content :global(p) {
+    margin-bottom: var(--space-6);
+    color: var(--color-text-secondary);
+  }
+
+  .post-content :global(ul),
+  .post-content :global(ol) {
+    margin-bottom: var(--space-6);
+    padding-left: var(--space-6);
+  }
+
+  .post-content :global(li) {
+    margin-bottom: var(--space-2);
+    color: var(--color-text-secondary);
+  }
+
+  .post-content :global(pre) {
+    margin-bottom: var(--space-6);
+  }
+
+  .post-content :global(blockquote) {
+    border-left: 3px solid var(--color-primary);
+    padding-left: var(--space-6);
+    margin: var(--space-6) 0;
+    font-style: italic;
+    color: var(--color-text-muted);
+  }
+
+  .post-content :global(a) {
+    color: var(--color-primary);
+    text-decoration: underline;
+  }
+
+  .post-content :global(strong) {
+    color: var(--color-text-primary);
+  }
+
+  .post-footer {
+    margin-top: var(--space-16);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .share-section {
+    text-align: center;
+  }
+
+  .share-section p {
+    margin-bottom: var(--space-4);
+  }
+</style>

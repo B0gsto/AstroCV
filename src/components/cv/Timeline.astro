@@ -1,0 +1,153 @@
+---
+// Timeline data based on LinkedIn
+const experiences = [
+  {
+    title: 'RPA Developer',
+    company: 'Tquila Automation',
+    period: 'Oct 2023 - Present',
+    description: 'Delivering enterprise UiPath automations end-to-end, API integrations, Orchestrator governance',
+    current: true,
+  },
+  {
+    title: 'RPA Developer Intern',
+    company: 'Tquila Automation',
+    period: 'Jul 2023 - Oct 2023',
+    description: 'UiPath fundamentals and Robotic Process Automation development',
+    current: false,
+  },
+  {
+    title: 'Event Organizer',
+    company: 'OSUBB Cluj-Napoca',
+    period: 'Oct 2022 - Sep 2023',
+    description: 'Volunteer work organizing educational events',
+    current: false,
+  },
+];
+---
+
+<div class="timeline">
+  {experiences.map((exp, index) => (
+    <div class={`timeline-item ${exp.current ? 'current' : ''}`} style={`animation-delay: ${index * 0.2}s`}>
+      <div class="timeline-marker">
+        <span class="timeline-dot"></span>
+        {index < experiences.length - 1 && <span class="timeline-line"></span>}
+      </div>
+      <div class="timeline-content card">
+        <div class="timeline-header">
+          <h3 class="timeline-title">{exp.title}</h3>
+          <span class="timeline-period tag">{exp.period}</span>
+        </div>
+        <p class="timeline-company">{exp.company}</p>
+        <p class="timeline-description">{exp.description}</p>
+      </div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .timeline {
+    position: relative;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  
+  .timeline-item {
+    display: flex;
+    gap: var(--space-6);
+    padding-bottom: var(--space-8);
+    opacity: 0;
+    animation: fadeInUp 0.6s ease forwards;
+  }
+  
+  .timeline-item:last-child {
+    padding-bottom: 0;
+  }
+  
+  .timeline-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  
+  .timeline-dot {
+    width: 16px;
+    height: 16px;
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    box-shadow: 0 0 20px var(--color-accent-glow);
+    z-index: 1;
+  }
+  
+  .current .timeline-dot {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+  
+  .timeline-line {
+    flex: 1;
+    width: 2px;
+    background: var(--color-border);
+    margin-top: var(--space-2);
+  }
+  
+  .timeline-content {
+    flex: 1;
+  }
+  
+  .timeline-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+  
+  .timeline-title {
+    font-size: var(--text-lg);
+    margin: 0;
+  }
+  
+  .timeline-period {
+    font-size: var(--text-xs);
+  }
+  
+  .timeline-company {
+    font-size: var(--text-sm);
+    color: var(--color-primary);
+    font-weight: 500;
+    margin-bottom: var(--space-2);
+  }
+  
+  .timeline-description {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: 0 0 20px var(--color-accent-glow);
+    }
+    50% {
+      box-shadow: 0 0 40px var(--color-accent-glow);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .timeline-header {
+      flex-direction: column;
+    }
+  }
+</style>

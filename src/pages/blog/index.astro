@@ -1,0 +1,92 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BlogCard from '../../components/blog/BlogCard.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+const sortedPosts = posts.sort((a, b) => b.data.publishDate.valueOf() - a.data.publishDate.valueOf());
+---
+
+<BaseLayout title="Blog - Bogdan Stoica" description="Articles about automation, RPA, and software development">
+  <div class="container">
+    <header class="page-header animate-fade-in-up">
+      <h1>Blog</h1>
+      <p class="page-description">
+        Thoughts, tutorials, and experiences from the world of automation and software development
+      </p>
+    </header>
+    
+    {sortedPosts.length === 0 ? (
+      <div class="empty-state">
+        <p>No articles yet. Coming soon!</p>
+      </div>
+    ) : (
+      <div class="posts-grid">
+        {sortedPosts.map((post, index) => (
+          <div class={`stagger-${Math.min(index + 1, 6)}`}>
+            <BlogCard
+              title={post.data.title}
+              description={post.data.description}
+              publishDate={post.data.publishDate}
+              tags={post.data.tags}
+              slug={post.slug}
+              coverImage={post.data.coverImage}
+            />
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .page-header {
+    text-align: center;
+    margin-bottom: var(--space-16);
+  }
+  
+  .page-header h1 {
+    margin-bottom: var(--space-4);
+  }
+  
+  .page-description {
+    font-size: var(--text-lg);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: var(--space-8);
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: var(--space-16);
+    color: var(--color-text-muted);
+  }
+  
+  .stagger-1, .stagger-2, .stagger-3, .stagger-4, .stagger-5, .stagger-6 {
+    opacity: 0;
+    animation: fadeInUp 0.5s ease forwards;
+  }
+  
+  .stagger-1 { animation-delay: 0.1s; }
+  .stagger-2 { animation-delay: 0.2s; }
+  .stagger-3 { animation-delay: 0.3s; }
+  .stagger-4 { animation-delay: 0.4s; }
+  .stagger-5 { animation-delay: 0.5s; }
+  .stagger-6 { animation-delay: 0.6s; }
+  
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

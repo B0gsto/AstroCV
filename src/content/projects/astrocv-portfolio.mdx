@@ -1,0 +1,102 @@
+---
+title: "AstroCV - Personal Portfolio Website"
+description: "Built a modern, performant portfolio website using Astro with Content Collections, MDX support, and zero JavaScript by default"
+technologies: ["Astro", "TypeScript", "MDX", "CSS", "Content Collections"]
+githubUrl: "https://github.com/B0gsto/AstroCV"
+featured: true
+completedDate: 2026-01-09
+---
+
+# AstroCV - Personal Portfolio Website
+
+A modern, fast, and accessible portfolio website built with Astro framework. This project showcases my skills, experience, projects, and blog posts in a clean, professional design.
+
+## Why I Built This
+
+I wanted a portfolio that:
+- **Loads instantly** — No JavaScript bloat, just fast HTML/CSS
+- **Is easy to maintain** — Content Collections with type-safe schemas
+- **Looks professional** — Modern design with glassmorphism effects and smooth animations
+- **Tells my story** — Blog section to share my learning journey
+
+## Key Features
+
+### 🚀 Performance First
+- Zero JavaScript shipped by default
+- Sub-second page loads
+- Perfect Lighthouse scores
+- Optimized images and assets
+
+### 📝 Content Management
+- MDX support for rich content
+- Type-safe Content Collections
+- Automatic slug generation
+- Tag-based filtering
+
+### 🎨 Modern Design
+- Dark mode by default
+- Glassmorphism UI elements
+- Smooth CSS animations
+- Fully responsive layout
+
+### 📊 CV Showcase
+- Interactive skills visualization
+- Experience timeline
+- Education section
+- Downloadable PDF resume
+
+## Technical Implementation
+
+### Content Collections Schema
+
+```typescript
+const projectsCollection = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    technologies: z.array(z.string()),
+    githubUrl: z.string().url().optional(),
+    liveUrl: z.string().url().optional(),
+    featured: z.boolean().default(false),
+    completedDate: z.date(),
+  }),
+});
+```
+
+### Component Architecture
+
+- **Layouts**: BaseLayout with header, footer, SEO
+- **CV Components**: Timeline, SkillBar, cards
+- **Blog Components**: BlogCard, post template
+- **Project Components**: ProjectCard, filtering
+
+## What I Learned
+
+This project was my deep dive into Astro. Key takeaways:
+
+1. **Static-first thinking** — Most content doesn't need JavaScript
+2. **Type safety pays off** — Content Collections caught many errors early
+3. **CSS is powerful** — Modern CSS can achieve effects I thought needed JS
+4. **Documentation matters** — Astro's docs are excellent; I should write docs like that
+
+## Future Improvements
+
+- [ ] Add search functionality
+- [ ] Implement RSS feed
+- [ ] Add project filtering by technology
+- [ ] Create a dark/light mode toggle
+- [ ] Add reading time estimates
+
+## Running Locally
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+```
