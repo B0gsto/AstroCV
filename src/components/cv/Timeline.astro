@@ -2,129 +2,159 @@
 // Timeline data based on LinkedIn
 const experiences = [
   {
-    title: 'RPA Developer',
-    company: 'Tquila Automation',
-    period: 'Oct 2023 - Present',
-    description: 'Delivering enterprise UiPath automations end-to-end, API integrations, Orchestrator governance',
+    title: "RPA Developer",
+    company: "Tquila Automation",
+    period: "2023-10 → present",
+    description:
+      "Delivering enterprise UiPath automations end-to-end, API integrations, Orchestrator governance",
     current: true,
   },
   {
-    title: 'RPA Developer Intern',
-    company: 'Tquila Automation',
-    period: 'Jul 2023 - Oct 2023',
-    description: 'UiPath fundamentals and Robotic Process Automation development',
+    title: "RPA Developer Intern",
+    company: "Tquila Automation",
+    period: "2023-07 → 2023-10",
+    description:
+      "UiPath fundamentals and Robotic Process Automation development",
     current: false,
   },
   {
-    title: 'Event Organizer',
-    company: 'OSUBB Cluj-Napoca',
-    period: 'Oct 2022 - Sep 2023',
-    description: 'Volunteer work organizing educational events',
+    title: "Event Organizer",
+    company: "OSUBB Cluj-Napoca",
+    period: "2022-10 → 2023-09",
+    description: "Volunteer work organizing educational events",
     current: false,
   },
 ];
 ---
 
-<div class="timeline">
-  {experiences.map((exp, index) => (
-    <div class={`timeline-item ${exp.current ? 'current' : ''}`} style={`animation-delay: ${index * 0.2}s`}>
-      <div class="timeline-marker">
-        <span class="timeline-dot"></span>
-        {index < experiences.length - 1 && <span class="timeline-line"></span>}
-      </div>
-      <div class="timeline-content card">
-        <div class="timeline-header">
-          <h3 class="timeline-title">{exp.title}</h3>
-          <span class="timeline-period tag">{exp.period}</span>
+<div class="timeline-terminal">
+  {
+    experiences.map((exp, index) => (
+      <div
+        class={`log-entry ${exp.current ? "current" : ""}`}
+        style={`animation-delay: ${index * 0.2}s`}
+      >
+        <div class="log-header">
+          <span class="log-date">[{exp.period}]</span>
+          <span class="log-action">{exp.current ? "ACTIVE" : "COMMIT"}</span>
         </div>
-        <p class="timeline-company">{exp.company}</p>
-        <p class="timeline-description">{exp.description}</p>
+        <div class="log-content">
+          <div class="log-title">
+            <span class="log-prompt">&gt;</span>
+            <span class="log-role">{exp.title}</span>
+            <span class="log-at">@</span>
+            <span class="log-company">{exp.company}</span>
+          </div>
+          <div class="log-description">
+            <span class="log-pipe">│</span>
+            <span>{exp.description}</span>
+          </div>
+        </div>
       </div>
-    </div>
-  ))}
+    ))
+  }
 </div>
 
 <style>
-  .timeline {
-    position: relative;
+  .timeline-terminal {
     max-width: 700px;
     margin: 0 auto;
+    font-family: var(--font-mono);
   }
-  
-  .timeline-item {
-    display: flex;
-    gap: var(--space-6);
-    padding-bottom: var(--space-8);
+
+  .log-entry {
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
+    background: rgba(0, 255, 65, 0.02);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
     opacity: 0;
     animation: fadeInUp 0.6s ease forwards;
+    transition: all var(--transition-base);
   }
-  
-  .timeline-item:last-child {
-    padding-bottom: 0;
+
+  .log-entry:hover {
+    border-color: var(--color-border-hover);
+    background: rgba(0, 255, 65, 0.05);
   }
-  
-  .timeline-marker {
+
+  .log-entry.current {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+  }
+
+  .log-header {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    flex-shrink: 0;
-  }
-  
-  .timeline-dot {
-    width: 16px;
-    height: 16px;
-    background: var(--gradient-primary);
-    border-radius: 50%;
-    box-shadow: 0 0 20px var(--color-accent-glow);
-    z-index: 1;
-  }
-  
-  .current .timeline-dot {
-    animation: pulseGlow 2s ease-in-out infinite;
-  }
-  
-  .timeline-line {
-    flex: 1;
-    width: 2px;
-    background: var(--color-border);
-    margin-top: var(--space-2);
-  }
-  
-  .timeline-content {
-    flex: 1;
-  }
-  
-  .timeline-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    margin-bottom: var(--space-2);
-  }
-  
-  .timeline-title {
-    font-size: var(--text-lg);
-    margin: 0;
-  }
-  
-  .timeline-period {
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
     font-size: var(--text-xs);
   }
-  
-  .timeline-company {
-    font-size: var(--text-sm);
+
+  .log-date {
+    color: var(--color-text-muted);
+  }
+
+  .log-action {
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .current .log-action {
+    background: rgba(0, 255, 65, 0.2);
     color: var(--color-primary);
-    font-weight: 500;
+  }
+
+  .log-entry:not(.current) .log-action {
+    background: rgba(0, 212, 255, 0.1);
+    color: var(--color-accent);
+  }
+
+  .log-content {
+    font-size: var(--text-sm);
+  }
+
+  .log-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
     margin-bottom: var(--space-2);
   }
-  
-  .timeline-description {
-    font-size: var(--text-sm);
-    color: var(--color-text-muted);
-    margin: 0;
+
+  .log-prompt {
+    color: var(--color-primary);
+    font-weight: bold;
   }
-  
+
+  .log-role {
+    color: var(--color-text-primary);
+    font-weight: 600;
+  }
+
+  .log-at {
+    color: var(--color-text-muted);
+  }
+
+  .log-company {
+    color: var(--color-accent);
+  }
+
+  .log-description {
+    display: flex;
+    gap: var(--space-3);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    padding-left: var(--space-2);
+  }
+
+  .log-pipe {
+    color: var(--color-border-hover);
+  }
+
   @keyframes fadeInUp {
     from {
       opacity: 0;
@@ -135,19 +165,12 @@ const experiences = [
       transform: translateY(0);
     }
   }
-  
-  @keyframes pulseGlow {
-    0%, 100% {
-      box-shadow: 0 0 20px var(--color-accent-glow);
-    }
-    50% {
-      box-shadow: 0 0 40px var(--color-accent-glow);
-    }
-  }
-  
+
   @media (max-width: 768px) {
-    .timeline-header {
+    .log-title {
       flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-1);
     }
   }
 </style>

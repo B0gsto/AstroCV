@@ -2,38 +2,48 @@
 const currentYear = new Date().getFullYear();
 
 const socialLinks = [
-  { href: "https://github.com/B0gsto", label: "GitHub" },
+  { href: "https://github.com/B0gsto", label: "github", icon: "→" },
   {
     href: "https://www.linkedin.com/in/bogdan-stoica-aa415820a/",
-    label: "LinkedIn",
+    label: "linkedin",
+    icon: "→",
   },
 ];
 ---
 
 <footer class="footer">
   <div class="container">
-    <div class="footer-content">
-      <div class="footer-brand">
-        <a href="/" class="footer-logo">
-          <span class="logo-icon">B</span>
-          <span>Bogdan Stoica</span>
-        </a>
-        <p class="footer-tagline">
-          UiPath RPA Engineer based in Cluj-Napoca, Romania.
-        </p>
+    <div class="footer-terminal">
+      <div class="footer-section">
+        <div class="terminal-line">
+          <span class="prompt">$</span>
+          <span class="command">whoami</span>
+        </div>
+        <div class="footer-output">
+          <span class="output-name">&gt;_b0gd4n</span> :: UiPath RPA Engineer
+        </div>
+        <div class="footer-output footer-location">
+          <span class="output-dim">└─ Cluj-Napoca, Romania</span>
+        </div>
       </div>
 
-      <div class="footer-links">
-        <h4>Navigation</h4>
-        <ul>
-          <li><a href="/">CV</a></li>
-          <li><a href="/blog">Blog</a></li>
-          <li><a href="/projects">Projects</a></li>
-        </ul>
+      <div class="footer-section">
+        <div class="terminal-line">
+          <span class="prompt">$</span>
+          <span class="command">cat</span> navigation.txt
+        </div>
+        <div class="footer-links">
+          <a href="/" class="footer-nav-link">[~/cv]</a>
+          <a href="/blog" class="footer-nav-link">[~/blog]</a>
+          <a href="/projects" class="footer-nav-link">[~/projects]</a>
+        </div>
       </div>
 
-      <div class="footer-social">
-        <h4>Connect</h4>
+      <div class="footer-section">
+        <div class="terminal-line">
+          <span class="prompt">$</span>
+          <span class="command">links</span> --social
+        </div>
         <div class="social-links">
           {
             socialLinks.map((link) => (
@@ -41,9 +51,12 @@ const socialLinks = [
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                class="social-link-btn"
+                class="social-link-terminal"
               >
-                {link.label}
+                <span class="link-bracket">[</span>
+                <span class="link-text">{link.label}</span>
+                <span class="link-bracket">]</span>
+                <span class="link-arrow">{link.icon}</span>
               </a>
             ))
           }
@@ -52,10 +65,16 @@ const socialLinks = [
     </div>
 
     <div class="footer-bottom">
-      <p>&copy; {currentYear} Bogdan Stoica. All rights reserved.</p>
-      <p class="footer-made">
-        Built with <a href="https://astro.build" target="_blank">Astro</a>
-      </p>
+      <div class="footer-copyright">
+        <span class="prompt">$</span> echo $COPYRIGHT
+      </div>
+      <div class="footer-output">
+        &gt; © {currentYear} bogdan_stoica | Built with <a
+          href="https://astro.build"
+          target="_blank"
+          class="astro-link">Astro</a
+        >
+      </div>
     </div>
   </div>
 </footer>
@@ -63,150 +82,144 @@ const socialLinks = [
 <style>
   .footer {
     margin-top: auto;
-    padding: 64px 0 32px;
+    padding: 48px 0 32px;
     border-top: 1px solid var(--color-border);
     background: var(--color-bg-secondary);
+    font-family: var(--font-mono);
   }
 
-  .footer-content {
+  .footer-terminal {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
     gap: 48px;
-    margin-bottom: 48px;
+    margin-bottom: 32px;
   }
 
-  .footer-brand {
-    max-width: 300px;
+  .footer-section {
+    font-size: var(--text-sm);
   }
 
-  .footer-logo {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--font-heading);
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--color-text-primary);
-    text-decoration: none;
-    margin-bottom: 16px;
+  .terminal-line {
+    margin-bottom: var(--space-3);
   }
 
-  .logo-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
-    font-weight: 800;
-    background: var(--gradient-primary);
-    color: var(--color-bg-primary);
-    border-radius: 8px;
+  .prompt {
+    color: var(--color-primary);
+    font-weight: bold;
   }
 
-  .footer-tagline {
-    font-size: 14px;
-    color: var(--color-text-muted);
-    line-height: 1.5;
+  .command {
+    color: var(--color-accent);
   }
 
-  .footer-links h4,
-  .footer-social h4 {
-    font-size: 12px;
+  .footer-output {
+    color: var(--color-text-secondary);
+    padding-left: var(--space-2);
+    margin-bottom: var(--space-2);
+  }
+
+  .output-name {
+    color: var(--color-primary);
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--color-text-muted);
-    margin-bottom: 16px;
   }
 
-  .footer-links ul {
-    list-style: none;
+  .output-dim {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+  }
+
+  .footer-links {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 0;
-    margin: 0;
+    gap: var(--space-2);
+    padding-left: var(--space-2);
   }
 
-  .footer-links a {
-    font-size: 14px;
+  .footer-nav-link {
     color: var(--color-text-secondary);
     text-decoration: none;
-    transition: color 0.2s ease;
+    transition: color var(--transition-fast);
   }
 
-  .footer-links a:hover {
+  .footer-nav-link:hover {
     color: var(--color-primary);
   }
 
   .social-links {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-2);
+    padding-left: var(--space-2);
   }
 
-  .social-link-btn {
+  .social-link-terminal {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    padding: 12px 24px;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--color-text-primary);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
+    gap: 4px;
+    color: var(--color-text-secondary);
     text-decoration: none;
-    transition: all 0.2s ease;
-    min-width: 120px;
+    transition: all var(--transition-fast);
   }
 
-  .social-link-btn:hover {
+  .social-link-terminal:hover {
     color: var(--color-primary);
-    border-color: var(--color-primary);
-    background: rgba(255, 111, 97, 0.1);
   }
 
-  .footer-bottom {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 32px;
-    border-top: 1px solid var(--color-border);
-    font-size: 14px;
+  .link-bracket {
     color: var(--color-text-muted);
   }
 
-  .footer-made a {
+  .link-text {
+    color: var(--color-accent);
+  }
+
+  .social-link-terminal:hover .link-text {
     color: var(--color-primary);
+  }
+
+  .link-arrow {
+    color: var(--color-primary);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: all var(--transition-fast);
+  }
+
+  .social-link-terminal:hover .link-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .footer-bottom {
+    padding-top: 24px;
+    border-top: 1px solid var(--color-border);
+    font-size: var(--text-sm);
+  }
+
+  .footer-copyright {
+    margin-bottom: var(--space-2);
+    color: var(--color-text-muted);
+  }
+
+  .astro-link {
+    color: var(--color-accent);
     text-decoration: none;
   }
 
-  .footer-made a:hover {
+  .astro-link:hover {
+    color: var(--color-primary);
     text-decoration: underline;
   }
 
   @media (max-width: 768px) {
-    .footer-content {
+    .footer-terminal {
       grid-template-columns: 1fr;
-      gap: 32px;
+      gap: 24px;
     }
 
     .social-links {
       flex-direction: row;
       flex-wrap: wrap;
-    }
-
-    .social-link-btn {
-      flex: 1;
-      min-width: 100px;
-    }
-
-    .footer-bottom {
-      flex-direction: column;
-      gap: 8px;
-      text-align: center;
+      gap: var(--space-4);
     }
   }
 </style>

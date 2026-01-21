@@ -5,71 +5,89 @@ interface Props {
 }
 
 const { name, level } = Astro.props;
+
+// Generate ASCII progress bar
+const totalBlocks = 20;
+const filledBlocks = Math.round((level / 100) * totalBlocks);
+const emptyBlocks = totalBlocks - filledBlocks;
+const progressBar = "█".repeat(filledBlocks) + "░".repeat(emptyBlocks);
+
+// Pad the skill name to align
+const paddedName = name.padEnd(18, " ");
 ---
 
-<div class="skill-bar-container">
-  <div class="skill-bar-header">
-    <span class="skill-name">{name}</span>
-    <span class="skill-level">{level}%</span>
-  </div>
-  <div class="skill-bar">
-    <div class="skill-bar-fill" style={`--skill-level: ${level}%`}></div>
+<div class="skill-terminal">
+  <div class="skill-row">
+    <span class="skill-name">{paddedName}</span>
+    <span class="skill-bar-ascii">[{progressBar}]</span>
+    <span class="skill-percent">{level}%</span>
   </div>
 </div>
 
 <style>
-  .skill-bar-container {
-    padding: var(--space-4);
-    background: var(--color-bg-card);
+  .skill-terminal {
+    padding: var(--space-3) var(--space-4);
+    background: rgba(0, 255, 65, 0.02);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-md);
     transition: all var(--transition-base);
-  }
-  
-  .skill-bar-container:hover {
-    border-color: var(--color-border-hover);
-    transform: translateY(-2px);
-  }
-  
-  .skill-bar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-3);
-  }
-  
-  .skill-name {
-    font-weight: 600;
-    font-size: var(--text-sm);
-    color: var(--color-text-primary);
-  }
-  
-  .skill-level {
-    font-size: var(--text-sm);
-    color: var(--color-primary);
-    font-weight: 600;
-  }
-  
-  .skill-bar {
-    width: 100%;
-    height: 8px;
-    background: var(--color-bg-tertiary);
-    border-radius: var(--radius-full);
     overflow: hidden;
   }
-  
-  .skill-bar-fill {
-    height: 100%;
-    background: var(--gradient-primary);
-    border-radius: var(--radius-full);
-    width: 0;
-    animation: fillBar 1s ease-out forwards;
-    animation-delay: 0.3s;
+
+  .skill-terminal:hover {
+    border-color: var(--color-border-hover);
+    background: rgba(0, 255, 65, 0.05);
   }
-  
-  @keyframes fillBar {
+
+  .skill-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    white-space: nowrap;
+  }
+
+  .skill-name {
+    color: var(--color-accent);
+    min-width: 160px;
+  }
+
+  .skill-bar-ascii {
+    color: var(--color-primary);
+    letter-spacing: 0;
+    flex-shrink: 0;
+    animation: revealBar 1s ease-out forwards;
+    clip-path: inset(0 100% 0 0);
+  }
+
+  .skill-percent {
+    color: var(--color-text-secondary);
+    min-width: 40px;
+    text-align: right;
+  }
+
+  @keyframes revealBar {
     to {
-      width: var(--skill-level);
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .skill-row {
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .skill-name {
+      min-width: auto;
+      flex: 1;
+    }
+
+    .skill-bar-ascii {
+      order: 3;
+      width: 100%;
+      font-size: var(--text-xs);
     }
   }
 </style>

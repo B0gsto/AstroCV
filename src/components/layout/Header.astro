@@ -2,9 +2,9 @@
 const currentPath = Astro.url.pathname;
 
 const navLinks = [
-  { href: "/", label: "CV" },
-  { href: "/blog", label: "Blog" },
-  { href: "/projects", label: "Projects" },
+  { href: "/", label: "~/cv" },
+  { href: "/blog", label: "~/blog" },
+  { href: "/projects", label: "~/projects" },
 ];
 ---
 
@@ -26,7 +26,7 @@ const navLinks = [
                 },
               ]}
             >
-              {link.label}
+              <span class="prompt">&gt;</span> {link.label}
             </a>
           </li>
         ))
@@ -36,7 +36,7 @@ const navLinks = [
       href="mailto:bogdan10andrei@gmail.com"
       class="btn btn-primary mobile-contact-btn"
     >
-      Contact
+      $ contact --now
     </a>
   </nav>
 </div>
@@ -44,8 +44,8 @@ const navLinks = [
 <header class="header glass" id="main-header">
   <div class="container header-container">
     <a href="/" class="logo">
-      <span class="logo-icon">B</span>
-      <span class="logo-text">Bogdan Stoica</span>
+      <span class="logo-icon">&gt;_</span>
+      <span class="logo-text">b0gd4n<span class="cursor">█</span></span>
     </a>
 
     <nav class="nav" id="main-nav">
@@ -64,6 +64,7 @@ const navLinks = [
                   },
                 ]}
               >
+                <span class="nav-prompt">&gt;</span>
                 <span>{link.label}</span>
               </a>
             </li>
@@ -74,7 +75,7 @@ const navLinks = [
 
     <div class="header-actions" id="header-actions">
       <a href="mailto:bogdan10andrei@gmail.com" class="btn btn-primary btn-sm">
-        Contact
+        $ contact
       </a>
     </div>
 
@@ -215,25 +216,37 @@ const navLinks = [
   .logo {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
-    font-family: var(--font-heading);
+    gap: var(--space-2);
+    font-family: var(--font-mono);
     font-size: var(--text-lg);
     font-weight: 700;
-    color: var(--color-text-primary);
+    color: var(--color-primary);
     text-decoration: none;
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
   }
 
   .logo-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    font-size: var(--text-lg);
-    font-weight: 800;
-    background: var(--gradient-primary);
-    color: var(--color-bg-primary);
-    border-radius: var(--radius-lg);
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  .logo-text {
+    color: var(--color-primary);
+  }
+
+  .cursor {
+    animation: blink 1s step-end infinite;
+    color: var(--color-primary);
+  }
+
+  @keyframes blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
   }
 
   .nav {
@@ -252,24 +265,37 @@ const navLinks = [
   .nav-link {
     display: flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: var(--space-1);
     padding: var(--space-2) var(--space-4);
     font-size: var(--text-sm);
     font-weight: 500;
+    font-family: var(--font-mono);
     color: var(--color-text-secondary);
     text-decoration: none;
     border-radius: var(--radius-lg);
     transition: all var(--transition-fast);
   }
 
+  .nav-prompt {
+    color: var(--color-primary);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+  }
+
+  .nav-link:hover .nav-prompt,
+  .nav-link.active .nav-prompt {
+    opacity: 1;
+  }
+
   .nav-link:hover {
-    color: var(--color-text-primary);
-    background: rgba(255, 255, 255, 0.05);
+    color: var(--color-primary);
+    background: rgba(0, 255, 65, 0.05);
+    text-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
   }
 
   .nav-link.active {
     color: var(--color-primary);
-    background: rgba(255, 111, 97, 0.1);
+    background: rgba(0, 255, 65, 0.1);
   }
 
   .header-actions {
@@ -281,6 +307,7 @@ const navLinks = [
   .btn-sm {
     padding: var(--space-2) var(--space-4);
     font-size: var(--text-sm);
+    font-family: var(--font-mono);
   }
 
   /* Mobile Menu Button */
