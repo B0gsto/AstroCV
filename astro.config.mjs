@@ -6,5 +6,10 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://stoicabogdanandrei.com',
-  integrations: [mdx(), sitemap()],
+  integrations: [
+    mdx(),
+    sitemap({
+      filter: (page) => !page.endsWith('/software-engineer/'),
+    }),
+  ],
 });

@@ -1,0 +1,62 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const homePath = "/";
+const shareTitle = "Bogdan Stoica — Software Engineer";
+const shareDescription =
+  "Software Engineer in Cluj-Napoca building Azure cloud infrastructure, integration-heavy systems, React Native products and reliable AI workflow tooling.";
+---
+
+<BaseLayout
+  title={shareTitle}
+  description={shareDescription}
+  canonicalPath={homePath}
+  ogPath="/software-engineer/"
+  robots="noindex, follow"
+>
+  <section class="section redirect-section">
+    <div class="container">
+      <div class="redirect-card card">
+        <span class="technical-label">LinkedIn preview refresh</span>
+        <h1>{shareTitle}</h1>
+        <p>{shareDescription}</p>
+        <p class="redirect-note">Redirecting to the main portfolio...</p>
+        <a class="btn btn-primary" href={homePath}>open portfolio</a>
+      </div>
+    </div>
+  </section>
+
+  <script is:inline>
+    window.location.replace("/");
+  </script>
+</BaseLayout>
+
+<style>
+  .redirect-section {
+    min-height: calc(100vh - 64px);
+    display: grid;
+    align-items: center;
+  }
+
+  .redirect-card {
+    max-width: 680px;
+    padding: 32px;
+  }
+
+  .redirect-card h1 {
+    margin: 12px 0;
+    font-size: clamp(32px, 6vw, 56px);
+    letter-spacing: -0.05em;
+  }
+
+  .redirect-card p {
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  .redirect-note {
+    margin: 18px 0;
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+</style>
