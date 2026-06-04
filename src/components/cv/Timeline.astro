@@ -1,176 +1,79 @@
 ---
-// Timeline data based on LinkedIn
 const experiences = [
   {
-    title: "RPA Developer",
-    company: "Tquila Automation",
-    period: "2023-10 → present",
+    title: "Software Engineer",
+    company: "Automatify",
+    period: "2026-03 → present",
     description:
-      "Delivering enterprise UiPath automations end-to-end, API integrations, Orchestrator governance",
+      "Azure infrastructure, CI/CD pipelines, React Native apps and AI-powered workflow systems.",
     current: true,
   },
   {
-    title: "RPA Developer Intern",
+    title: "Automation & Integration Engineer",
     company: "Tquila Automation",
-    period: "2023-07 → 2023-10",
+    period: "2023-07 → 2026-03",
     description:
-      "UiPath fundamentals and Robotic Process Automation development",
+      "Production systems, API integrations, operational reliability and client-facing delivery.",
     current: false,
   },
   {
     title: "Event Organizer",
     company: "OSUBB Cluj-Napoca",
     period: "2022-10 → 2023-09",
-    description: "Volunteer work organizing educational events",
+    description: "Volunteer work organizing educational events.",
     current: false,
   },
 ];
 ---
 
-<div class="timeline-terminal">
+<div class="timeline-list">
   {
-    experiences.map((exp, index) => (
-      <div
-        class={`log-entry ${exp.current ? "current" : ""}`}
-        style={`animation-delay: ${index * 0.2}s`}
-      >
-        <div class="log-header">
-          <span class="log-date">[{exp.period}]</span>
-          <span class="log-action">{exp.current ? "ACTIVE" : "COMMIT"}</span>
-        </div>
-        <div class="log-content">
-          <div class="log-title">
-            <span class="log-prompt">&gt;</span>
-            <span class="log-role">{exp.title}</span>
-            <span class="log-at">@</span>
-            <span class="log-company">{exp.company}</span>
-          </div>
-          <div class="log-description">
-            <span class="log-pipe">│</span>
-            <span>{exp.description}</span>
-          </div>
-        </div>
-      </div>
+    experiences.map((exp) => (
+      <article class:list={["timeline-card", "card", { current: exp.current }]}> 
+        <span>{exp.period}</span>
+        <h3>{exp.title}</h3>
+        <p class="company">{exp.company}</p>
+        <p>{exp.description}</p>
+      </article>
     ))
   }
 </div>
 
 <style>
-  .timeline-terminal {
-    max-width: 700px;
+  .timeline-list {
+    display: grid;
+    gap: 16px;
+    max-width: 820px;
     margin: 0 auto;
+  }
+
+  .timeline-card {
+    padding: 24px;
+  }
+
+  .timeline-card > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .timeline-card.current {
+    border-color: rgba(56, 189, 248, 0.35);
+  }
+
+  span {
+    color: var(--color-primary-light);
     font-family: var(--font-mono);
+    font-size: 12px;
   }
 
-  .log-entry {
-    padding: var(--space-4);
-    margin-bottom: var(--space-4);
-    background: rgba(0, 255, 65, 0.02);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    opacity: 0;
-    animation: fadeInUp 0.6s ease forwards;
-    transition: all var(--transition-base);
+  h3 {
+    margin: 10px 0 6px;
+    font-size: 22px;
   }
 
-  .log-entry:hover {
-    border-color: var(--color-border-hover);
-    background: rgba(0, 255, 65, 0.05);
-  }
-
-  .log-entry.current {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
-  }
-
-  .log-header {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    margin-bottom: var(--space-3);
-    font-size: var(--text-xs);
-  }
-
-  .log-date {
-    color: var(--color-text-muted);
-  }
-
-  .log-action {
-    padding: 2px 8px;
-    border-radius: var(--radius-sm);
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-  }
-
-  .current .log-action {
-    background: rgba(0, 255, 65, 0.2);
-    color: var(--color-primary);
-  }
-
-  .log-entry:not(.current) .log-action {
-    background: rgba(0, 212, 255, 0.1);
-    color: var(--color-accent);
-  }
-
-  .log-content {
-    font-size: var(--text-sm);
-  }
-
-  .log-title {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    flex-wrap: wrap;
-    margin-bottom: var(--space-2);
-  }
-
-  .log-prompt {
-    color: var(--color-primary);
-    font-weight: bold;
-  }
-
-  .log-role {
+  .company {
     color: var(--color-text-primary);
-    font-weight: 600;
-  }
-
-  .log-at {
-    color: var(--color-text-muted);
-  }
-
-  .log-company {
-    color: var(--color-accent);
-  }
-
-  .log-description {
-    display: flex;
-    gap: var(--space-3);
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
-    padding-left: var(--space-2);
-  }
-
-  .log-pipe {
-    color: var(--color-border-hover);
-  }
-
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @media (max-width: 768px) {
-    .log-title {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--space-1);
-    }
+    font-weight: 700;
+    margin-bottom: 8px;
   }
 </style>

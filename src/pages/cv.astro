@@ -1,0 +1,332 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const experience = [
+  {
+    role: "Software Engineer",
+    company: "Automatify",
+    period: "Mar 2026 — Present",
+    location: "Cluj-Napoca · Hybrid",
+    points: [
+      "Architect, develop and manage Azure infrastructure using Container Apps, Key Vault and Azure DevOps pipelines.",
+      "Develop cross-platform mobile applications using React Native and Expo.",
+      "Build AI-powered workflow solutions using Microsoft Foundry and Model Context Protocol integrations.",
+    ],
+  },
+  {
+    role: "RPA Developer / Automation & Integration Engineer",
+    company: "Tquila Automation",
+    period: "Jul 2023 — Mar 2026",
+    location: "Romania · Remote",
+    points: [
+      "Delivered 4 enterprise UiPath automations end-to-end as solo developer, from requirements and solution design to release and support.",
+      "Integrated REST APIs with OAuth authentication, pagination, rate limiting and retry/backoff logic for production reliability.",
+      "Managed UiPath Orchestrator queues, assets, credentials, triggers, schedules, folders and Dev/UAT/Prod release governance.",
+      "Standardized REFramework usage with idempotency boundaries, error taxonomy, structured logging and correlation IDs.",
+      "Handled client-facing communication in English, explaining technical solutions clearly to non-technical stakeholders.",
+    ],
+  },
+];
+
+const projects = [
+  "Enterprise Integration Systems — anonymized production case study covering 4 UiPath systems with REST/OAuth integrations, Orchestrator governance and CI/CD release promotion.",
+  "Viver Mobile Platform — private product experiment with Expo React Native and Go microservices for auth, profiles, discovery, matching, chat and media.",
+  "AI Code Review Server — TypeScript/Express/React developer tool using LLMs, Zod validation, risk scoring, Prometheus metrics and MCP integration path.",
+  "Rust Cloud Terminal — Rust/Axum + Yew/WebAssembly systems experiment with S3/DynamoDB-backed workspace persistence.",
+];
+
+const skillGroups = [
+  { label: "Cloud & DevOps", items: ["Microsoft Azure", "Container Apps", "Key Vault", "Azure DevOps", "Docker", "CI/CD"] },
+  { label: "Product Engineering", items: ["Next.js", "React", "React Native", "Expo", "TypeScript", "SQL"] },
+  { label: "Integrations & Automation", items: ["REST APIs", "OAuth", "UiPath", "Orchestrator", "REFramework", "Structured Logging"] },
+  { label: "AI & Systems", items: ["Microsoft Foundry", "MCP", "LLM APIs", "Go", "Rust", "WebAssembly"] },
+];
+---
+
+<BaseLayout
+  title="CV — Bogdan Stoica"
+  description="Bogdan Stoica CV: Software Engineer focused on Azure, Next.js, React Native, integrations, automation and AI workflow systems."
+>
+  <article class="container cv-page">
+    <header class="cv-hero">
+      <div>
+        <span class="technical-label">CV / Engineering Profile</span>
+        <h1>Bogdan Stoica</h1>
+        <p class="cv-title">Software Engineer · Azure · Next.js · React Native · Integrations</p>
+        <p class="cv-summary">
+          I build and ship enterprise applications end-to-end, from architecture and integration design to deployment pipelines and production support. Based in Cluj-Napoca, open to contract, B2B and full-time opportunities.
+        </p>
+      </div>
+      <div class="cv-actions no-print">
+        <button class="btn btn-primary" id="print-cv" type="button">save as pdf</button>
+        <a href="mailto:bogdan10andrei@gmail.com?subject=Software%20engineering%20opportunity" class="btn btn-secondary">email me</a>
+      </div>
+    </header>
+
+    <section class="cv-contact card">
+      <a href="mailto:bogdan10andrei@gmail.com">bogdan10andrei@gmail.com</a>
+      <a href="https://www.linkedin.com/in/bogdan-stoica-aa415820a/" target="_blank" rel="noopener noreferrer">linkedin.com/in/bogdan-stoica-aa415820a</a>
+      <a href="https://github.com/B0gsto" target="_blank" rel="noopener noreferrer">github.com/B0gsto</a>
+      <span>Cluj-Napoca, Romania · English C1 near-native</span>
+    </section>
+
+    <section class="cv-section">
+      <h2>Experience</h2>
+      <div class="cv-timeline">
+        {experience.map((item) => (
+          <div class="cv-entry card">
+            <div class="cv-entry-header">
+              <div>
+                <h3>{item.role}</h3>
+                <p>{item.company} · {item.location}</p>
+              </div>
+              <span>{item.period}</span>
+            </div>
+            <ul>
+              {item.points.map((point) => <li>{point}</li>)}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="cv-section">
+      <h2>Selected project evidence</h2>
+      <div class="cv-projects card">
+        <ul>
+          {projects.map((project) => <li>{project}</li>)}
+        </ul>
+      </div>
+    </section>
+
+    <section class="cv-section">
+      <h2>Technical stack</h2>
+      <div class="cv-skills-grid">
+        {skillGroups.map((group) => (
+          <div class="cv-skill-card card">
+            <h3>{group.label}</h3>
+            <div class="cv-tags">
+              {group.items.map((item) => <span class="tag">{item}</span>)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="cv-section two-col">
+      <div class="card cv-block">
+        <h2>Education</h2>
+        <p><strong>Master's Degree, Computer Science</strong><br />Babeș-Bolyai University · 2025 — 2027</p>
+        <p><strong>Bachelor's Degree, Computer Science</strong><br />Babeș-Bolyai University · 2022 — 2025</p>
+      </div>
+      <div class="card cv-block">
+        <h2>Certifications & awards</h2>
+        <ul>
+          <li>Boot.dev Learn Go Course · issued Jan 2026</li>
+          <li>Boot.dev Learn HTTP Clients in Go Course · issued Jan 2026</li>
+          <li>Romanian National Olympiads in Informatics, county phase — Second place</li>
+          <li>FIRST Tech Challenge Romania — Collins Aerospace Innovate Award</li>
+        </ul>
+      </div>
+    </section>
+  </article>
+
+  <script is:inline>
+    const button = document.getElementById("print-cv");
+    if (button) button.addEventListener("click", () => window.print());
+  </script>
+</BaseLayout>
+
+<style>
+  .cv-page {
+    max-width: 980px;
+    padding-top: clamp(100px, 12vw, 150px);
+    padding-bottom: 80px;
+  }
+
+  .cv-hero {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 32px;
+    align-items: start;
+    margin-bottom: 28px;
+  }
+
+  .cv-hero h1 {
+    margin-bottom: 8px;
+  }
+
+  .cv-title {
+    font-family: var(--font-mono);
+    color: var(--color-accent);
+    font-size: 13px;
+    margin-bottom: 18px;
+  }
+
+  .cv-summary {
+    max-width: 720px;
+    font-size: 16px;
+  }
+
+  .cv-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .cv-contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 18px;
+    padding: 18px;
+    margin-bottom: 44px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-text-secondary);
+  }
+
+  .cv-section {
+    margin-top: 44px;
+  }
+
+  .cv-section > h2 {
+    margin-bottom: 18px;
+  }
+
+  .cv-timeline {
+    display: grid;
+    gap: 18px;
+  }
+
+  .cv-entry,
+  .cv-projects,
+  .cv-skill-card,
+  .cv-block {
+    padding: 24px;
+  }
+
+  .cv-entry-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 16px;
+  }
+
+  .cv-entry-header h3 {
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+
+  .cv-entry-header p,
+  .cv-entry-header span {
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+
+  .cv-entry ul,
+  .cv-projects ul,
+  .cv-block ul {
+    padding-left: 18px;
+    display: grid;
+    gap: 9px;
+    color: var(--color-text-secondary);
+  }
+
+  .cv-entry li,
+  .cv-projects li,
+  .cv-block li {
+    line-height: 1.6;
+  }
+
+  .cv-skills-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .cv-skill-card h3 {
+    font-size: 15px;
+    margin-bottom: 14px;
+  }
+
+  .cv-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .cv-block h2 {
+    font-size: 22px;
+    margin-bottom: 16px;
+  }
+
+  .cv-block p + p {
+    margin-top: 16px;
+  }
+
+  .cv-block strong {
+    color: var(--color-text);
+  }
+
+  @media (max-width: 760px) {
+    .cv-hero,
+    .two-col,
+    .cv-skills-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .cv-actions {
+      justify-content: flex-start;
+    }
+
+    .cv-entry-header {
+      flex-direction: column;
+      gap: 6px;
+    }
+  }
+
+  @media print {
+    :global(.site-header),
+    :global(.site-footer),
+    :global(#ascii-canvas),
+    .no-print {
+      display: none !important;
+    }
+
+    :global(body),
+    :global(html) {
+      background: white !important;
+      color: #111827 !important;
+    }
+
+    .cv-page {
+      padding: 24px 0;
+      max-width: 100%;
+    }
+
+    .card {
+      border-color: #d1d5db;
+      box-shadow: none;
+      background: white;
+      break-inside: avoid;
+    }
+
+    :global(h1),
+    :global(h2),
+    :global(h3),
+    :global(p),
+    :global(li),
+    :global(span),
+    :global(a) {
+      color: #111827 !important;
+    }
+  }
+</style>

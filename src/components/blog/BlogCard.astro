@@ -10,122 +10,116 @@ interface Props {
 
 const { title, description, publishDate, tags, slug, coverImage } = Astro.props;
 
-const formattedDate = new Intl.DateTimeFormat('en-US', {
-  year: 'numeric',
-  month: 'long',
-  day: 'numeric',
+const formattedDate = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
 }).format(publishDate);
-
-// Estimate reading time (rough calculation)
-const readingTime = '5 min read';
 ---
 
-<article class="blog-card card hover-lift">
-  <a href={`/blog/${slug}`} class="blog-card-link">
+<article class="blog-card card">
+  <a href={`/blog/${slug}`} class="blog-card-link" aria-label={`Read article: ${title}`}>
     {coverImage && (
-      <div class="blog-card-image">
-        <img src={coverImage} alt={title} loading="lazy" />
+      <div class="blog-card-image-wrapper">
+        <img src={coverImage} alt={title} loading="lazy" class="blog-card-img" />
       </div>
     )}
     <div class="blog-card-content">
       <div class="blog-card-meta">
-        <time datetime={publishDate.toISOString()}>{formattedDate}</time>
-        <span class="separator">-</span>
-        <span>{readingTime}</span>
+        <time datetime={publishDate.toISOString()} class="mono-date">{formattedDate}</time>
       </div>
-      
-      <h3 class="blog-card-title">{title}</h3>
-      <p class="blog-card-description">{description}</p>
-      
+      <h3>{title}</h3>
+      <p>{description}</p>
       <div class="blog-card-tags">
-        {tags.slice(0, 3).map((tag) => (
-          <span class="tag">{tag}</span>
-        ))}
+        {tags.slice(0, 3).map((tag) => <span class="tag">{tag}</span>)}
       </div>
-      
-      <span class="blog-card-cta">
-        Read article
-      </span>
+      <span class="blog-card-cta">read article →</span>
     </div>
   </a>
 </article>
 
 <style>
   .blog-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     overflow: hidden;
   }
-  
+
   .blog-card-link {
-    display: block;
-    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
     color: inherit;
   }
-  
-  .blog-card-image {
+
+  .blog-card-image-wrapper {
+    width: 100%;
     aspect-ratio: 16 / 9;
     overflow: hidden;
-    margin: calc(var(--space-6) * -1);
-    margin-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+    background: #0d111b;
   }
-  
-  .blog-card-image img {
+
+  .blog-card-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform var(--transition-slow);
+    transition: transform var(--transition-base);
   }
-  
-  .blog-card:hover .blog-card-image img {
-    transform: scale(1.05);
+
+  .blog-card:hover .blog-card-img {
+    transform: scale(1.03);
   }
-  
+
   .blog-card-content {
-    padding-top: var(--space-4);
-  }
-  
-  .blog-card-meta {
     display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-size: var(--text-xs);
+    flex-direction: column;
+    gap: 12px;
+    padding: 24px;
+    flex-grow: 1;
+  }
+
+  .blog-card-meta {
+    margin-bottom: 2px;
+  }
+
+  .mono-date {
+    font-family: var(--font-mono);
+    font-size: 11px;
     color: var(--color-text-muted);
-    margin-bottom: var(--space-3);
   }
-  
-  .separator {
-    color: var(--color-border);
+
+  h3 {
+    font-size: 18px;
+    letter-spacing: -0.02em;
+    font-weight: 700;
   }
-  
-  .blog-card-title {
-    font-size: var(--text-xl);
-    margin-bottom: var(--space-3);
-    transition: color var(--transition-fast);
-  }
-  
-  .blog-card:hover .blog-card-title {
-    color: var(--color-primary);
-  }
-  
-  .blog-card-description {
-    font-size: var(--text-sm);
+
+  p {
+    font-size: 14px;
     color: var(--color-text-secondary);
-    margin-bottom: var(--space-4);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    line-height: 1.55;
+    margin-bottom: auto;
   }
-  
+
   .blog-card-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-2);
-    margin-bottom: var(--space-4);
+    gap: 6px;
+    margin-top: 14px;
   }
-  
+
   .blog-card-cta {
-    font-size: var(--text-sm);
+    margin-top: 16px;
+    color: var(--color-accent);
+    font-family: var(--font-primary);
+    font-size: 13px;
     font-weight: 600;
-    color: var(--color-primary);
+    transition: color var(--transition-fast);
+  }
+
+  .blog-card:hover .blog-card-cta {
+    color: var(--color-text);
   }
 </style>

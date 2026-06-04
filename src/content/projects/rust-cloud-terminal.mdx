@@ -1,0 +1,40 @@
+---
+title: "Rust Cloud Terminal"
+description: "A Rust/Axum and Yew/WebAssembly experiment for a browser-based Linux terminal with S3/DynamoDB-backed workspace persistence."
+technologies: ["Rust", "Axum", "Yew", "WebAssembly", "AWS S3", "DynamoDB", "JWT"]
+githubUrl: "https://github.com/B0gsto/rust_cloud_os"
+outcome: "Explores lower-level systems design: WASM execution, workspace persistence, secure auth, storage quotas and cloud-backed state management."
+featured: true
+completedDate: 2026-06-01
+---
+
+# Rust Cloud Terminal
+
+A systems-focused experiment for a browser-based persistent Linux terminal. The architecture uses a Rust Axum backend, a Yew/WebAssembly frontend and AWS-backed state persistence.
+
+## What it explores
+
+The goal is to understand the shape of a cloud terminal that avoids always-on server compute. Instead of running every user session on an expensive backend instance, the project explores browser-side execution with persisted workspace state.
+
+## Architecture
+
+- **Rust Axum API** for authentication, static asset serving and workspace persistence endpoints.
+- **Yew/WebAssembly frontend** for the browser dashboard and terminal surface.
+- **AWS S3** for workspace snapshot and system image storage.
+- **AWS DynamoDB** for user records and quota/account state.
+- **JWT-protected cookies** for authenticated sessions.
+- **Path traversal protection and quota checks** around stored workspace assets.
+
+## Engineering details
+
+The project forced decisions around:
+
+- streaming large assets without loading everything into memory;
+- cross-origin isolation for browser execution features;
+- atomic DynamoDB condition expressions for safe state updates;
+- separating baseline runtime images from user-specific workspace overlays;
+- designing the API so workspace persistence is explicit and observable.
+
+## Why it matters
+
+This is not positioned as a production SaaS product. It is a technical deepening project that demonstrates my current direction: Rust, backend systems, cloud storage, WebAssembly and practical infrastructure thinking.

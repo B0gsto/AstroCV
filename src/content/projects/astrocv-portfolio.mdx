@@ -1,102 +1,32 @@
 ---
-title: "AstroCV - Personal Portfolio Website"
-description: "Built a modern, performant portfolio website using Astro with Content Collections, MDX support, and zero JavaScript by default"
-technologies: ["Astro", "TypeScript", "MDX", "CSS", "Content Collections"]
+title: "Personal Engineering Site"
+description: "A fast, content-driven professional site built with Astro to present my engineering profile, project evidence and writing."
+technologies: ["Astro", "TypeScript", "MDX", "Content Collections", "CSS"]
 githubUrl: "https://github.com/B0gsto/AstroCV"
-featured: true
-completedDate: 2026-01-09
+liveUrl: "https://stoicabogdanandrei.com/"
+outcome: "Static-first site with typed content collections, minimal JavaScript, responsive CSS and clear recruiter/client positioning."
+featured: false
+completedDate: 2026-06-03
 ---
 
-# AstroCV - Personal Portfolio Website
+# Personal Engineering Site
 
-A modern, fast, and accessible portfolio website built with Astro framework. This project showcases my skills, experience, projects, and blog posts in a clean, professional design.
+A focused personal site built with Astro, designed to work as a professional surface for recruiters, collaborators and engineering teams.
 
-## Why I Built This
+## Goals
 
-I wanted a portfolio that:
-- **Loads instantly** — No JavaScript bloat, just fast HTML/CSS
-- **Is easy to maintain** — Content Collections with type-safe schemas
-- **Looks professional** — Modern design with glassmorphism effects and smooth animations
-- **Tells my story** — Blog section to share my learning journey
+- Present my current profile clearly: software engineering, cloud, product work and AI workflows.
+- Keep the site fast and maintainable through static-first architecture.
+- Use content collections for projects and writing so updates stay type-safe.
+- Avoid unnecessary client-side JavaScript while still delivering a polished experience.
 
-## Key Features
+## Implementation
 
-### 🚀 Performance First
-- Zero JavaScript shipped by default
-- Sub-second page loads
-- Perfect Lighthouse scores
-- Optimized images and assets
+The site uses Astro pages, MDX content collections and scoped component styles. The design system is built with CSS custom properties, responsive grids and a compact set of reusable global classes.
 
-### 📝 Content Management
-- MDX support for rich content
-- Type-safe Content Collections
-- Automatic slug generation
-- Tag-based filtering
+## What I optimized for
 
-### 🎨 Modern Design
-- Dark mode by default
-- Glassmorphism UI elements
-- Smooth CSS animations
-- Fully responsive layout
-
-### 📊 CV Showcase
-- Interactive skills visualization
-- Experience timeline
-- Education section
-- Downloadable PDF resume
-
-## Technical Implementation
-
-### Content Collections Schema
-
-```typescript
-const projectsCollection = defineCollection({
-  type: 'content',
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    technologies: z.array(z.string()),
-    githubUrl: z.string().url().optional(),
-    liveUrl: z.string().url().optional(),
-    featured: z.boolean().default(false),
-    completedDate: z.date(),
-  }),
-});
-```
-
-### Component Architecture
-
-- **Layouts**: BaseLayout with header, footer, SEO
-- **CV Components**: Timeline, SkillBar, cards
-- **Blog Components**: BlogCard, post template
-- **Project Components**: ProjectCard, filtering
-
-## What I Learned
-
-This project was my deep dive into Astro. Key takeaways:
-
-1. **Static-first thinking** — Most content doesn't need JavaScript
-2. **Type safety pays off** — Content Collections caught many errors early
-3. **CSS is powerful** — Modern CSS can achieve effects I thought needed JS
-4. **Documentation matters** — Astro's docs are excellent; I should write docs like that
-
-## Future Improvements
-
-- [ ] Add search functionality
-- [ ] Implement RSS feed
-- [ ] Add project filtering by technology
-- [ ] Create a dark/light mode toggle
-- [ ] Add reading time estimates
-
-## Running Locally
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-```
+- **Clarity** — recruiters should understand my value in under one minute.
+- **Performance** — static pages, minimal JavaScript and clean CSS.
+- **Maintainability** — project and writing content lives in typed MDX files.
+- **Professional positioning** — the site highlights ownership, architecture and delivery rather than tool-specific labels.

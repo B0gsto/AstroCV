@@ -1,37 +1,34 @@
 ---
-title: "AI-Powered Code Review Server"
-description: "Built a code review server that uses LLMs via OpenRouter with MCP Protocol support for direct integration with Claude Code"
-technologies: ["TypeScript", "Express", "React", "Vite", "Zod", "Docker", "MCP Protocol"]
+title: "AI Code Review Server"
+description: "A developer-tooling project that reviews code changes with LLMs, structured risk scoring, Prometheus metrics and an MCP-compatible integration path."
+technologies: ["TypeScript", "Express", "React", "Vite", "Zod", "Docker", "MCP", "Prometheus"]
 githubUrl: "https://github.com/B0gsto/ai-code-review-server"
+outcome: "Turns LLM review output into validated severities, categories and risk scores; includes dashboard, metrics and no stored credentials."
 featured: true
 completedDate: 2026-01-07
 ---
 
-# AI-Powered Code Review Server
+# AI Code Review Server
 
-Built a code review server that uses LLMs via OpenRouter to analyze code and provide feedback with issues and risk scores.
+A code review assistant that analyzes source code or diffs, returns structured feedback, highlights risk areas and exposes an MCP-compatible integration path for AI-enabled developer workflows.
 
-## Features
+## What it does
 
-- React dashboard where you can paste code or diffs and get feedback
-- Issues detection with severity levels
-- Risk scoring for code changes
-- MCP Protocol support for direct integration with Claude Code
-- Docker containerization for easy deployment
+- Accepts code snippets or diffs through a React dashboard.
+- Sends review requests to LLMs through OpenRouter.
+- Returns issues grouped by severity and category.
+- Produces a risk score to help prioritize follow-up.
+- Supports a protocol-oriented integration path for AI coding tools.
+- Exposes Prometheus metrics and structured logging for operational visibility.
+- Avoids stored credentials by accepting the API key per request.
 
-## Technical Stack
+## Technical decisions
 
-- **Frontend**: React + Vite for a fast, modern UI
-- **Backend**: Express.js with TypeScript
-- **Validation**: Zod for runtime type checking
-- **AI Integration**: OpenRouter for LLM access
-- **Protocol**: MCP (Model Context Protocol) for editor integration
-- **Deployment**: Docker and Docker Compose
+- **TypeScript end-to-end** for shared mental models across frontend and backend.
+- **Zod validation** to keep model responses and API payloads safe at runtime.
+- **Express API** for a small, predictable service surface.
+- **Docker Compose** for quick local setup and reproducible environments.
 
-## Architecture
+## Why it matters
 
-The server exposes a RESTful API for code review requests and also implements the MCP protocol for seamless integration with AI-powered editors like Claude Code.
-
-## Lessons Learned
-
-This project taught me about integrating LLMs into development workflows and the importance of providing structured, actionable feedback to developers.
+This project explores how AI can become useful only when wrapped in structure: validation, deterministic response formats, clear severity levels and a workflow that developers can trust.

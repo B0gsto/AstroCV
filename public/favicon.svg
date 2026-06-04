@@ -1,10 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
   <defs>
-    <linearGradient id="coral-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#FF6F61"/>
-      <stop offset="100%" style="stop-color:#FFDAB9"/>
+    <linearGradient id="g" x1="18" y1="12" x2="112" y2="116" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8"/>
+      <stop offset="0.55" stop-color="#6366F1"/>
+      <stop offset="1" stop-color="#A855F7"/>
     </linearGradient>
   </defs>
-  <circle cx="64" cy="64" r="56" fill="url(#coral-gradient)"/>
-  <text x="64" y="80" font-family="system-ui, sans-serif" font-size="48" font-weight="bold" fill="#1A1A2E" text-anchor="middle">B</text>
+  <rect x="12" y="12" width="104" height="104" rx="32" fill="url(#g)"/>
+  <text x="64" y="76" font-family="Inter, system-ui, sans-serif" font-size="38" font-weight="800" fill="#FFFFFF" text-anchor="middle">BS</text>
 </svg>
