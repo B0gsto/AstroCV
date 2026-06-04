@@ -5,6 +5,6 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://bogdan.dev', // Update with your domain
+  site: 'https://stoicabogdanandrei.com',
   integrations: [mdx(), sitemap()],
 });

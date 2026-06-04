@@ -1,17 +1,17 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import { getCollection } from "astro:content";
+import { getCollection, render } from "astro:content";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog");
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
   return posts.map((post) => ({
-    params: { slug: post.slug },
+    params: { slug: post.id },
     props: { post },
   }));
 }
 
 const { post } = Astro.props;
-const { Content } = await post.render();
+const { Content } = await render(post);
 
 const formattedDate = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
@@ -24,19 +24,17 @@ const formattedDate = new Intl.DateTimeFormat("en-US", {
   title={`${post.data.title} - Blog`}
   description={post.data.description}
 >
-  <article class="container blog-post">
-    <header class="post-header animate-fade-in-up">
-      <a href="/blog" class="back-link">Back to blog</a>
+  <article class="container blog-post animate-fade-in">
+    <header class="post-header">
+      <a href="/blog" class="back-link">← back to writing</a>
 
       <div class="post-meta">
-        <time datetime={post.data.publishDate.toISOString()}
-          >{formattedDate}</time
-        >
-        <span class="separator">-</span>
-        <span>5 min read</span>
+        <time datetime={post.data.publishDate.toISOString()} class="mono-date">{formattedDate}</time>
+        <span class="separator">·</span>
+        <span class="read-time">5 min read</span>
       </div>
 
-      <h1>{post.data.title}</h1>
+      <h1 class="post-title">{post.data.title}</h1>
       <p class="post-description">{post.data.description}</p>
 
       <div class="post-tags">
@@ -46,7 +44,7 @@ const formattedDate = new Intl.DateTimeFormat("en-US", {
 
     {
       post.data.coverImage && (
-        <div class="post-cover">
+        <div class="post-cover card">
           <img src={post.data.coverImage} alt={post.data.title} />
         </div>
       )
@@ -58,8 +56,8 @@ const formattedDate = new Intl.DateTimeFormat("en-US", {
 
     <footer class="post-footer">
       <div class="share-section">
-        <p>Enjoyed this article?</p>
-        <a href="/blog" class="btn btn-secondary">Read more</a>
+        <p>Liked the writeup? Check out other notes.</p>
+        <a href="/blog" class="btn btn-secondary">view all writing</a>
       </div>
     </footer>
   </article>
@@ -67,7 +65,9 @@ const formattedDate = new Intl.DateTimeFormat("en-US", {
 
 <style>
   .blog-post {
-    max-width: 1000px;
+    max-width: 820px;
+    padding-top: clamp(100px, 12vw, 150px);
+    padding-bottom: 80px;
   }
 
   .post-header {
@@ -78,57 +78,62 @@ const formattedDate = new Intl.DateTimeFormat("en-US", {
   .back-link {
     display: inline-block;
     font-size: var(--text-sm);
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-8);
+    color: var(--color-text-muted);
+    margin-bottom: 24px;
     transition: color var(--transition-fast);
   }
 
   .back-link:hover {
-    color: var(--color-primary);
+    color: var(--color-accent);
   }
 
   .post-meta {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: var(--space-2);
-    font-size: var(--text-sm);
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
     color: var(--color-text-muted);
-    margin-bottom: var(--space-4);
+    margin-bottom: 16px;
   }
 
   .separator {
-    color: var(--color-border);
+    color: var(--color-accent);
   }
 
-  .post-header h1 {
-    font-size: var(--text-4xl);
-    margin-bottom: var(--space-4);
+  .post-title {
+    font-size: clamp(2rem, 4.5vw, 3rem);
+    margin-bottom: 16px;
+    letter-spacing: -0.03em;
   }
 
   .post-description {
     font-size: var(--text-lg);
     color: var(--color-text-secondary);
-    max-width: 600px;
-    margin: 0 auto var(--space-6);
+    max-width: 660px;
+    margin: 0 auto 28px;
+    line-height: 1.6;
   }
 
   .post-tags {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: var(--space-2);
+    gap: 8px;
   }
 
   .post-cover {
     margin-bottom: var(--space-12);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     overflow: hidden;
+    padding: 0;
   }
 
   .post-cover img {
     width: 100%;
     height: auto;
+    display: block;
   }
 
   /* Prose styles */
@@ -138,59 +143,59 @@ const formattedDate = new Intl.DateTimeFormat("en-US", {
 
   .post-content :global(h2) {
     font-size: var(--text-2xl);
-    margin-top: var(--space-12);
-    margin-bottom: var(--space-4);
-    padding-top: var(--space-4);
-    border-top: 1px solid var(--color-border);
+    margin-top: 40px;
+    margin-bottom: 16px;
+    padding-top: 24px;
+    border-top: 1px dashed var(--color-border);
   }
 
   .post-content :global(h3) {
     font-size: var(--text-xl);
-    margin-top: var(--space-8);
-    margin-bottom: var(--space-3);
+    margin-top: 32px;
+    margin-bottom: 12px;
   }
 
   .post-content :global(p) {
-    margin-bottom: var(--space-6);
+    margin-bottom: 20px;
     color: var(--color-text-secondary);
   }
 
   .post-content :global(ul),
   .post-content :global(ol) {
-    margin-bottom: var(--space-6);
-    padding-left: var(--space-6);
+    margin-bottom: 20px;
+    padding-left: 20px;
   }
 
   .post-content :global(li) {
-    margin-bottom: var(--space-2);
+    margin-bottom: 8px;
     color: var(--color-text-secondary);
   }
 
   .post-content :global(pre) {
-    margin-bottom: var(--space-6);
+    margin-bottom: 24px;
   }
 
   .post-content :global(blockquote) {
-    border-left: 3px solid var(--color-primary);
-    padding-left: var(--space-6);
-    margin: var(--space-6) 0;
+    border-left: 2px solid var(--color-accent);
+    padding-left: 20px;
+    margin: 24px 0;
     font-style: italic;
     color: var(--color-text-muted);
   }
 
   .post-content :global(a) {
-    color: var(--color-primary);
+    color: var(--color-accent);
     text-decoration: underline;
   }
 
   .post-content :global(strong) {
-    color: var(--color-text-primary);
+    color: var(--color-text);
   }
 
   .post-footer {
-    margin-top: var(--space-16);
-    padding-top: var(--space-8);
-    border-top: 1px solid var(--color-border);
+    margin-top: 64px;
+    padding-top: 32px;
+    border-top: 1px dashed var(--color-border);
   }
 
   .share-section {
@@ -198,6 +203,8 @@ const formattedDate = new Intl.DateTimeFormat("en-US", {
   }
 
   .share-section p {
-    margin-bottom: var(--space-4);
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: var(--color-text-muted);
   }
 </style>

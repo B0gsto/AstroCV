@@ -1,17 +1,17 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
   return projects.map((project) => ({
-    params: { slug: project.slug },
+    params: { slug: project.id },
     props: { project },
   }));
 }
 
 const { project } = Astro.props;
-const { Content } = await project.render();
+const { Content } = await render(project);
 
 const formattedDate = new Intl.DateTimeFormat('en-US', {
   year: 'numeric',
@@ -20,14 +20,12 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
 ---
 
 <BaseLayout title={`${project.data.title} - Projects`} description={project.data.description}>
-  <article class="container project-page">
-    <header class="project-header animate-fade-in-up">
-      <a href="/projects" class="back-link">Back to projects</a>
-      
-      {project.data.featured && <span class="featured-badge tag">Featured Project</span>}
-      
-      <h1>{project.data.title}</h1>
+  <article class="container project-page animate-fade-in">
+    <header class="project-header">
+      <a href="/projects" class="back-link">← back to projects</a>
+      <h1 class="project-title">{project.data.title}</h1>
       <p class="project-description">{project.data.description}</p>
+      {project.data.outcome && <p class="project-outcome"><span>Outcome:</span> {project.data.outcome}</p>}
       
       <div class="project-tech">
         {project.data.technologies.map((tech: string) => (
@@ -38,12 +36,12 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
       <div class="project-actions">
         {project.data.liveUrl && (
           <a href={project.data.liveUrl} class="btn btn-primary" target="_blank" rel="noopener noreferrer">
-            View Live
+            view live
           </a>
         )}
         {project.data.githubUrl && (
           <a href={project.data.githubUrl} class="btn btn-secondary" target="_blank" rel="noopener noreferrer">
-            GitHub
+            view github
           </a>
         )}
       </div>
@@ -52,7 +50,7 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
     </header>
     
     {project.data.coverImage && (
-      <div class="project-cover">
+      <div class="project-cover card">
         <img src={project.data.coverImage} alt={project.data.title} />
       </div>
     )}
@@ -62,14 +60,16 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
     </div>
     
     <footer class="project-footer">
-      <a href="/projects" class="btn btn-secondary">View all projects</a>
+      <a href="/projects" class="btn btn-secondary">view all projects</a>
     </footer>
   </article>
 </BaseLayout>
 
 <style>
   .project-page {
-    max-width: 900px;
+    max-width: 820px;
+    padding-top: clamp(100px, 12vw, 150px);
+    padding-bottom: 80px;
   }
   
   .project-header {
@@ -81,69 +81,76 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
     display: inline-block;
     font-size: var(--text-sm);
     color: var(--color-text-secondary);
-    margin-bottom: var(--space-6);
+    margin-bottom: 24px;
     transition: color var(--transition-fast);
   }
   
   .back-link:hover {
-    color: var(--color-primary);
+    color: var(--color-accent);
   }
-  
-  .featured-badge {
-    display: inline-block;
-    margin-bottom: var(--space-4);
-  }
-  
-  .project-header h1 {
-    font-size: var(--text-4xl);
-    margin-bottom: var(--space-4);
+
+  .project-title {
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    margin-bottom: 16px;
+    letter-spacing: -0.03em;
   }
   
   .project-description {
     font-size: var(--text-lg);
     color: var(--color-text-secondary);
-    max-width: 700px;
-    margin: 0 auto var(--space-6);
+    max-width: 660px;
+    margin: 0 auto 28px;
+    line-height: 1.6;
   }
   
+  .project-outcome {
+    max-width: 660px;
+    margin: -12px auto 28px;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .project-outcome span {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
   .project-tech {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: var(--space-2);
-    margin-bottom: var(--space-6);
+    gap: 8px;
+    margin-bottom: 28px;
   }
-  
-  .tech-badge {
-    padding: var(--space-1) var(--space-3);
-    background: var(--color-bg-tertiary);
-    border-radius: var(--radius-md);
-    font-size: var(--text-sm);
-    color: var(--color-text-secondary);
-  }
-  
+
   .project-actions {
     display: flex;
     justify-content: center;
-    gap: var(--space-4);
-    margin-bottom: var(--space-4);
+    gap: 16px;
+    margin-bottom: 24px;
   }
-  
+
   .project-date {
-    font-size: var(--text-sm);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
     color: var(--color-text-muted);
   }
   
   .project-cover {
     margin-bottom: var(--space-12);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    border: 1px solid var(--color-border);
+    padding: 0;
   }
   
   .project-cover img {
     width: 100%;
     height: auto;
+    display: block;
   }
   
   /* Prose styles */
@@ -153,42 +160,42 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
   
   .project-content :global(h2) {
     font-size: var(--text-2xl);
-    margin-top: var(--space-12);
-    margin-bottom: var(--space-4);
-    padding-top: var(--space-4);
-    border-top: 1px solid var(--color-border);
+    margin-top: 40px;
+    margin-bottom: 16px;
+    padding-top: 24px;
+    border-top: 1px dashed var(--color-border);
   }
   
   .project-content :global(h3) {
     font-size: var(--text-xl);
-    margin-top: var(--space-8);
-    margin-bottom: var(--space-3);
+    margin-top: 32px;
+    margin-bottom: 12px;
   }
   
   .project-content :global(p) {
-    margin-bottom: var(--space-6);
+    margin-bottom: 20px;
     color: var(--color-text-secondary);
   }
   
   .project-content :global(ul),
   .project-content :global(ol) {
-    margin-bottom: var(--space-6);
-    padding-left: var(--space-6);
+    margin-bottom: 20px;
+    padding-left: 20px;
   }
   
   .project-content :global(li) {
-    margin-bottom: var(--space-2);
+    margin-bottom: 8px;
     color: var(--color-text-secondary);
   }
   
   .project-content :global(strong) {
-    color: var(--color-text-primary);
+    color: var(--color-text);
   }
   
   .project-footer {
-    margin-top: var(--space-16);
-    padding-top: var(--space-8);
-    border-top: 1px solid var(--color-border);
+    margin-top: 64px;
+    padding-top: 32px;
+    border-top: 1px dashed var(--color-border);
     text-align: center;
   }
 </style>

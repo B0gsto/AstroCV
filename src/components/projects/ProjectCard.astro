@@ -7,43 +7,50 @@ interface Props {
   githubUrl?: string;
   liveUrl?: string;
   coverImage?: string;
+  outcome?: string;
   featured?: boolean;
 }
 
-const { title, description, technologies, slug, githubUrl, liveUrl, coverImage, featured } = Astro.props;
+const {
+  title,
+  description,
+  technologies,
+  slug,
+  githubUrl,
+  liveUrl,
+  coverImage,
+  outcome,
+  featured,
+} = Astro.props;
 ---
 
-<article class={`project-card card hover-lift ${featured ? 'featured' : ''}`}>
-  <a href={`/projects/${slug}`} class="project-card-link">
+<article class:list={["project-card", "card", { featured }]}> 
+  <a href={`/projects/${slug}`} class="project-main" aria-label={`View details for ${title}`}>
     {coverImage && (
-      <div class="project-card-image">
-        <img src={coverImage} alt={title} loading="lazy" />
+      <div class="project-image-wrapper">
+        <img src={coverImage} alt={title} loading="lazy" class="project-img" />
       </div>
     )}
-    <div class="project-card-content">
-      {featured && <span class="featured-badge">Featured</span>}
-      
-      <h3 class="project-card-title">{title}</h3>
-      <p class="project-card-description">{description}</p>
-      
-      <div class="project-card-tech">
-        {technologies.slice(0, 4).map((tech) => (
-          <span class="tech-badge">{tech}</span>
-        ))}
+    <div class="project-content">
+      <div class="project-header">
+        {featured && <span class="featured-badge">Featured Build</span>}
+        <h3>{title}</h3>
+      </div>
+      <p>{description}</p>
+      {outcome && <p class="project-outcome"><span>Outcome</span>{outcome}</p>}
+      <div class="project-tech">
+        {technologies.slice(0, 4).map((tech) => <span class="tech-badge">{tech}</span>)}
       </div>
     </div>
   </a>
-  
-  <div class="project-card-actions">
+
+  <div class="project-actions">
+    <a href={`/projects/${slug}`} class="action-link">details →</a>
     {liveUrl && (
-      <a href={liveUrl} class="action-btn" target="_blank" rel="noopener noreferrer" aria-label="Live demo">
-        Demo
-      </a>
+      <a href={liveUrl} class="action-link" target="_blank" rel="noopener noreferrer">live demo ↗</a>
     )}
     {githubUrl && (
-      <a href={githubUrl} class="action-btn" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-        GitHub
-      </a>
+      <a href={githubUrl} class="action-link" target="_blank" rel="noopener noreferrer">github code ↗</a>
     )}
   </div>
 </article>
@@ -52,107 +59,122 @@ const { title, description, technologies, slug, githubUrl, liveUrl, coverImage, 
   .project-card {
     display: flex;
     flex-direction: column;
+    height: 100%;
     overflow: hidden;
   }
-  
+
   .project-card.featured {
-    border-color: var(--color-primary);
-    box-shadow: var(--shadow-glow);
+    border-color: rgba(56, 189, 248, 0.2);
+    box-shadow: 0 4px 24px rgba(56, 189, 248, 0.02);
   }
-  
-  .project-card-link {
-    display: block;
-    text-decoration: none;
+
+  .project-main {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
     color: inherit;
-    flex: 1;
   }
-  
-  .project-card-image {
-    aspect-ratio: 16 / 10;
+
+  .project-image-wrapper {
+    width: 100%;
+    aspect-ratio: 16 / 9;
     overflow: hidden;
-    margin: calc(var(--space-6) * -1);
-    margin-bottom: var(--space-4);
-    background: var(--color-bg-tertiary);
+    border-bottom: 1px solid var(--color-border);
+    background: #0d111b;
   }
-  
-  .project-card-image img {
+
+  .project-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform var(--transition-slow);
+    transition: transform var(--transition-base);
   }
-  
-  .project-card:hover .project-card-image img {
-    transform: scale(1.05);
+
+  .project-card:hover .project-img {
+    transform: scale(1.03);
   }
-  
-  .project-card-content {
-    flex: 1;
-    padding-top: var(--space-4);
+
+  .project-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 24px;
+    flex-grow: 1;
   }
-  
+
+  .project-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
   .featured-badge {
-    display: inline-block;
-    font-size: var(--text-xs);
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 10px;
     font-weight: 600;
-    color: var(--color-primary);
-    margin-bottom: var(--space-2);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
-  
-  .project-card-title {
-    font-size: var(--text-xl);
-    margin-bottom: var(--space-3);
-    transition: color var(--transition-fast);
+
+  h3 {
+    font-size: 18px;
+    letter-spacing: -0.02em;
+    font-weight: 700;
   }
-  
-  .project-card:hover .project-card-title {
-    color: var(--color-primary);
-  }
-  
-  .project-card-description {
-    font-size: var(--text-sm);
+
+  p {
+    font-size: 14px;
     color: var(--color-text-secondary);
-    margin-bottom: var(--space-4);
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    line-height: 1.55;
   }
-  
-  .project-card-tech {
+
+  .project-outcome {
+    display: grid;
+    gap: 4px;
+    margin-top: 4px;
+    padding-top: 12px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.05);
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    line-height: 1.45;
+  }
+
+  .project-outcome span {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .project-tech {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-2);
-    margin-bottom: var(--space-4);
+    gap: 6px;
+    margin-top: auto;
+    padding-top: 14px;
   }
-  
-  .tech-badge {
-    font-size: var(--text-xs);
-    padding: var(--space-1) var(--space-2);
-    background: var(--color-bg-tertiary);
-    border-radius: var(--radius-sm);
-    color: var(--color-text-secondary);
-  }
-  
-  .project-card-actions {
+
+  .project-actions {
     display: flex;
-    gap: var(--space-3);
-    padding-top: var(--space-4);
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 16px 24px;
     border-top: 1px solid var(--color-border);
+    background: rgba(14, 19, 32, 0.15);
+    font-family: var(--font-primary);
   }
-  
-  .action-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-1);
-    font-size: var(--text-sm);
-    font-weight: 500;
+
+  .action-link {
     color: var(--color-text-secondary);
-    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
     transition: color var(--transition-fast);
   }
-  
-  .action-btn:hover {
-    color: var(--color-primary);
+
+  .action-link:hover {
+    color: var(--color-accent);
   }
 </style>

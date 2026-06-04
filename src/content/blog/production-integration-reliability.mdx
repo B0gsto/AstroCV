@@ -1,0 +1,89 @@
+---
+title: "How I Design Production Integrations for Reliability"
+description: "The patterns I use when building REST/OAuth-heavy automations and backend workflows that need to survive real production conditions."
+publishDate: 2026-06-04
+tags: ["integrations", "oauth", "reliability", "automation", "systems design"]
+draft: false
+---
+
+# How I Design Production Integrations for Reliability
+
+Most integration work looks simple at the start: call an API, transform a payload, update another system. In production, the hard part is rarely the first successful request. The hard part is everything that happens after partial failure.
+
+The systems I trust are designed around the assumption that external services will be slow, tokens will expire, data will be inconsistent, and retries will happen at the worst possible time.
+
+## Start with failure modes
+
+Before writing the integration code, I map the main failure classes:
+
+- authentication failure or token refresh failure;
+- rate limits or temporary throttling;
+- pagination drift or cursor invalidation;
+- malformed or incomplete payloads;
+- duplicate processing after retry;
+- permanent business-rule rejection;
+- downstream outage during a partially completed transaction.
+
+This turns the integration from a linear script into a small system with states, decisions and recovery paths.
+
+## Separate transient and permanent errors
+
+A common reliability mistake is treating every error the same. Some failures should be retried. Others should be escalated immediately.
+
+I usually separate errors into:
+
+- **transient errors** — network failures, temporary 5xx responses, rate limits;
+- **business errors** — missing required fields, validation failures, rejected records;
+- **permanent technical errors** — invalid credentials, unsupported schema, broken configuration.
+
+That separation makes retries safer and incident handling clearer.
+
+## Make retries explicit
+
+Retries need limits, spacing and visibility. I prefer exponential backoff with a clear maximum attempt count, plus enough logging to understand why a transaction is still failing.
+
+In queue-based systems, each transaction should carry its own retry history. In backend services, retry attempts should be visible through logs, metrics or traces. Silent retry loops are dangerous because they hide both cost and failure.
+
+## Design for idempotency
+
+If a system retries a transaction, the same logical operation may run more than once. That means the integration needs an idempotency boundary.
+
+Depending on the system, that can mean:
+
+- checking whether the target record already exists;
+- storing an external correlation ID;
+- using idempotency keys if the API supports them;
+- splitting read/validate/write stages;
+- making duplicate detection part of the workflow.
+
+The goal is simple: a retry should not create duplicate business outcomes.
+
+## Use correlation IDs from the beginning
+
+When something breaks in production, logs need to answer: what transaction was this, what external calls were made, and where did it stop?
+
+I like every transaction to carry a correlation ID through the workflow. That ID should appear in structured logs, queue references, error messages and stakeholder-facing incident notes.
+
+Without correlation IDs, production support becomes guesswork.
+
+## Treat OAuth as a subsystem
+
+OAuth handling deserves its own care. Token expiry, refresh flows, environment-specific credentials and permission drift are common production issues.
+
+A good integration makes authentication behavior explicit:
+
+- where credentials live;
+- when tokens are refreshed;
+- how refresh failures are reported;
+- whether scopes are sufficient;
+- how credentials differ between Dev/UAT/Prod.
+
+This is less glamorous than core business logic, but it is often the difference between a demo and a reliable system.
+
+## Production integrations are operational products
+
+The final question I ask is not only “does it work?” but “can someone support this at 03:00 when a client reports an issue?”
+
+That changes the design. It encourages structured logs, clear error categories, retry boundaries, release discipline and documentation.
+
+For contractor work, this is the mindset I care about most: build the integration so it can be operated, not just shown.

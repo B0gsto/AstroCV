@@ -1,0 +1,44 @@
+---
+title: "Enterprise Integration Systems"
+description: "An anonymized case study from 4 enterprise UiPath automations delivered end-to-end as solo developer, with REST/OAuth integrations and production governance."
+technologies: ["UiPath", "REST APIs", "OAuth", "Orchestrator", "CI/CD", "REFramework", "Structured Logging"]
+outcome: "4 production systems delivered end-to-end; Dev/UAT/Prod release flow, queue-based retries, audit-friendly logs and client-facing delivery ownership."
+featured: true
+completedDate: 2026-03-15
+---
+
+# Enterprise Integration Systems
+
+An anonymized case study covering the type of enterprise automation work I delivered at Tquila Automation. The exact clients and business domains are confidential, but the engineering patterns are representative.
+
+## Context
+
+The work involved production automations that had to integrate with external systems, handle business exceptions safely, and run under governance across development, UAT and production environments.
+
+I worked as the solo developer on 4 enterprise systems, covering requirements clarification, solution design, implementation, release promotion and post-release support.
+
+## My role
+
+- Translate business requirements into implementation-ready workflow design.
+- Build UiPath automations using a standardized REFramework structure.
+- Integrate REST APIs with OAuth authentication, pagination and rate-limit handling.
+- Configure Orchestrator queues, assets, credentials, triggers, schedules and folders.
+- Manage package versioning and release promotion across Dev/UAT/Prod.
+- Communicate technical choices clearly to non-technical stakeholders in English.
+
+## Reliability patterns
+
+The systems were designed for production behavior rather than happy-path demos:
+
+- **Retry/backoff logic** for transient API failures.
+- **Queue-driven processing** with transaction-level status and SLA visibility.
+- **Idempotency boundaries** so failed transactions could be retried safely.
+- **Error taxonomy** separating transient, business and permanent errors.
+- **Correlation IDs and structured logs** to make audits and incident investigation easier.
+- **Credential isolation** through Orchestrator assets and credentials.
+
+## Why it matters
+
+This experience is directly relevant to contractor work because it combines implementation with operational responsibility. I was not only writing workflows — I was owning the lifecycle from initial understanding to production support.
+
+The strongest transferable skill is the ability to build integration-heavy systems that survive real operational constraints: authentication drift, rate limits, partial failures, unclear requirements and stakeholder pressure.

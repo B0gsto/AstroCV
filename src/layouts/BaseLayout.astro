@@ -1,7 +1,6 @@
 ---
 import Header from "../components/layout/Header.astro";
 import Footer from "../components/layout/Footer.astro";
-import BootSequence from "../components/BootSequence.astro";
 import "../styles/global.css";
 import "../styles/animations.css";
 
@@ -10,65 +9,207 @@ interface Props {
   description?: string;
 }
 
-const { title, description = "Portfolio personal - CV, Blog & Proiecte" } =
-  Astro.props;
+const {
+  title,
+  description = "Bogdan Stoica — Software Engineer building cloud, web, mobile and AI workflow systems.",
+} = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL = new URL("/og-image.svg", Astro.site);
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Bogdan Stoica",
+  jobTitle: "Software Engineer",
+  url: Astro.site?.toString(),
+  image: new URL("/images/profile.jpg", Astro.site).toString(),
+  email: "mailto:bogdan10andrei@gmail.com",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Cluj-Napoca",
+    addressCountry: "RO",
+  },
+  alumniOf: {
+    "@type": "CollegeOrUniversity",
+    name: "Babeș-Bolyai University",
+  },
+  knowsAbout: [
+    "Microsoft Azure",
+    "Next.js",
+    "React Native",
+    "REST API integrations",
+    "OAuth",
+    "AI workflow systems",
+    "DevOps",
+  ],
+  sameAs: [
+    "https://github.com/B0gsto",
+    "https://www.linkedin.com/in/bogdan-stoica-aa415820a/",
+  ],
+};
 ---
 
 <!doctype html>
-<html lang="ro">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#07111f" />
 
-    <!-- Open Graph -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
 
-    <!-- Fonts -->
+    <script type="application/ld+json" set:html={JSON.stringify(personJsonLd)}></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
 
     <link rel="canonical" href={canonicalURL} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-
     <title>{title}</title>
   </head>
   <body>
-    <BootSequence />
-    <div class="layout">
+    <!-- Background Canvas for ASCII cursor trails -->
+    <canvas id="ascii-canvas"></canvas>
+
+    <div class="site-shell">
       <Header />
       <main class="main page-transition">
         <slot />
       </main>
       <Footer />
     </div>
+
+    <!-- Inline script to ensure direct, instant client execution -->
+    <script is:inline>
+      (function() {
+        const canvas = document.getElementById('ascii-canvas');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Safety check for user preferences regarding motion
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reducedMotion) return;
+
+        let particles = [];
+        const chars = ['0', '1', '{', '}', '[', ']', '+', '-', '*', '/', ';', '<', '>', '&', '|', '~', '^', '%'];
+        let mouseX = 0;
+        let mouseY = 0;
+        let lastSpawn = 0;
+
+        function resize() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        }
+
+        resize();
+        window.addEventListener('resize', resize);
+
+        window.addEventListener('mousemove', function(e) {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+
+          const now = Date.now();
+          if (now - lastSpawn > 35) { // spawn particle every 35ms
+            spawn(mouseX, mouseY, true);
+            lastSpawn = now;
+          }
+        });
+
+        // Background passive drift particles
+        const passiveInterval = setInterval(function() {
+          if (particles.length < 20) {
+            spawn(
+              Math.random() * window.innerWidth,
+              Math.random() * window.innerHeight,
+              false
+            );
+          }
+        }, 750);
+
+        function spawn(x, y, isMouse) {
+          const char = chars[Math.floor(Math.random() * chars.length)];
+          particles.push({
+            x: x,
+            y: y,
+            char: char,
+            size: isMouse ? 12 + Math.random() * 8 : 8 + Math.random() * 4,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: -0.2 - Math.random() * 0.35, // floating up vector
+            alpha: isMouse ? 0.35 : 0.12, // elevated alpha to render clearly against dark background
+            decay: isMouse ? 0.005 : 0.002
+          });
+        }
+
+        function animate() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          for (let i = particles.length - 1; i >= 0; i--) {
+            const p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.alpha -= p.decay;
+
+            if (p.alpha <= 0 || p.x < 0 || p.x > canvas.width || p.y < 0) {
+              particles.splice(i, 1);
+              continue;
+            }
+
+            ctx.fillStyle = 'rgba(56, 189, 248, ' + p.alpha + ')'; // sky-blue accent
+            ctx.font = p.size + 'px Courier New, monospace';
+            ctx.fillText(p.char, p.x, p.y);
+          }
+
+          requestAnimationFrame(animate);
+        }
+
+        animate();
+      })();
+    </script>
   </body>
 </html>
 
 <style>
-  .layout {
+  .site-shell {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    position: relative;
+    z-index: 10;
   }
 
   .main {
     flex: 1;
-    padding-top: var(--space-24);
-    padding-bottom: var(--space-16);
+    padding-top: 64px;
+  }
+
+  #ascii-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    pointer-events: none;
+    display: block;
+    /* CSS opacity set to 1 so particle rendering is controlled purely via JS alpha values */
+    opacity: 1;
   }
 </style>

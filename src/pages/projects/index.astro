@@ -1,98 +1,90 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import ProjectCard from '../../components/projects/ProjectCard.astro';
-import { getCollection } from 'astro:content';
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProjectCard from "../../components/projects/ProjectCard.astro";
+import { getCollection } from "astro:content";
 
-const projects = await getCollection('projects');
-const featuredProjects = projects.filter((p) => p.data.featured);
-const otherProjects = projects.filter((p) => !p.data.featured);
-const sortedProjects = [...featuredProjects, ...otherProjects].sort(
+const projects = (await getCollection("projects")).sort(
   (a, b) => b.data.completedDate.valueOf() - a.data.completedDate.valueOf()
 );
 ---
 
-<BaseLayout title="Projects - Bogdan Stoica" description="Personal projects and open source contributions">
-  <div class="container">
-    <header class="page-header animate-fade-in-up">
-      <h1>Projects</h1>
-      <p class="page-description">
-        A collection of personal projects and open source contributions
-      </p>
-    </header>
-    
-    {sortedProjects.length === 0 ? (
-      <div class="empty-state">
-        <p>No projects yet. Working on something new!</p>
-      </div>
-    ) : (
+<BaseLayout
+  title="Projects — Bogdan Stoica"
+  description="Selected software engineering projects and anonymized case studies by Bogdan Stoica: integrations, cloud systems, mobile products and AI tooling."
+>
+  <section class="section projects-page">
+    <div class="container">
+      <header class="page-header animate-fade-in-up">
+        <span class="technical-label">Selected Work</span>
+        <h1>Selected builds and case studies.</h1>
+        <p>
+          Project evidence across enterprise integrations, cloud-backed products, mobile engineering, AI tooling and systems experiments.
+        </p>
+      </header>
+
       <div class="projects-grid">
-        {sortedProjects.map((project, index) => (
-          <div class={`stagger-${Math.min(index + 1, 6)}`}>
+        {
+          projects.map((project) => (
             <ProjectCard
               title={project.data.title}
               description={project.data.description}
               technologies={project.data.technologies}
-              slug={project.slug}
+              slug={project.id}
               githubUrl={project.data.githubUrl}
               liveUrl={project.data.liveUrl}
               coverImage={project.data.coverImage}
+              outcome={project.data.outcome}
               featured={project.data.featured}
             />
-          </div>
-        ))}
+          ))
+        }
       </div>
-    )}
-  </div>
+    </div>
+  </section>
 </BaseLayout>
 
 <style>
+  .projects-page {
+    padding-top: clamp(100px, 12vw, 150px);
+  }
+
   .page-header {
+    max-width: 720px;
+    margin: 0 auto 56px;
     text-align: center;
-    margin-bottom: var(--space-16);
   }
-  
+
+  .page-header .technical-label {
+    justify-content: center;
+  }
+
   .page-header h1 {
-    margin-bottom: var(--space-4);
+    font-size: clamp(2rem, 4vw, 3rem);
+    margin: 12px 0 16px;
+    letter-spacing: -0.03em;
   }
-  
-  .page-description {
-    font-size: var(--text-lg);
-    max-width: 600px;
-    margin: 0 auto;
+
+  .page-header p {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
   }
-  
+
   .projects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: var(--space-8);
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
   }
-  
-  .empty-state {
-    text-align: center;
-    padding: var(--space-16);
-    color: var(--color-text-muted);
-  }
-  
-  .stagger-1, .stagger-2, .stagger-3, .stagger-4, .stagger-5, .stagger-6 {
-    opacity: 0;
-    animation: fadeInUp 0.5s ease forwards;
-  }
-  
-  .stagger-1 { animation-delay: 0.1s; }
-  .stagger-2 { animation-delay: 0.2s; }
-  .stagger-3 { animation-delay: 0.3s; }
-  .stagger-4 { animation-delay: 0.4s; }
-  .stagger-5 { animation-delay: 0.5s; }
-  .stagger-6 { animation-delay: 0.6s; }
-  
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
+
+  @media (max-width: 980px) {
+    .projects-grid {
+      grid-template-columns: repeat(2, 1fr);
     }
-    to {
-      opacity: 1;
-      transform: translateY(0);
+  }
+
+  @media (max-width: 640px) {
+    .projects-grid {
+      grid-template-columns: 1fr;
     }
   }
 </style>

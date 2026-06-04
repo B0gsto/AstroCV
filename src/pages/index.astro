@@ -1,94 +1,225 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import ProjectCard from "../components/projects/ProjectCard.astro";
 import { getCollection } from "astro:content";
-import Timeline from "../components/cv/Timeline.astro";
-import SkillBar from "../components/cv/SkillBar.astro";
 
-const cvSections = await getCollection("cv");
-const sortedSections = cvSections.sort((a, b) => a.data.order - b.data.order);
+const featuredProjects = (await getCollection("projects"))
+  .filter((project) => project.data.featured)
+  .sort((a, b) => b.data.completedDate.valueOf() - a.data.completedDate.valueOf())
+  .slice(0, 4);
 
-// Skills based on LinkedIn profile
-const skills = [
-  { name: "UiPath", level: 95, category: "RPA" },
-  { name: "REFramework", level: 90, category: "RPA" },
-  { name: "Model Context Protocol", level: 35, category: "RPA" },
-  { name: "REST APIs", level: 99, category: "Development" },
-  { name: "React", level: 50, category: "Development" },
-  { name: "React Native", level: 45, category: "Development" },
-  { name: "C#", level: 30, category: "Development" },
-  { name: "Java", level: 30, category: "Development" },
-  { name: "TypeScript", level: 65, category: "Development" },
+const engagementFit = [
+  {
+    id: "01",
+    label: "Azure / DevOps",
+    title: "Cloud implementation contractor",
+    description:
+      "I can set up and operate Azure infrastructure, Container Apps, Key Vault configuration, CI/CD pipelines and release flows for small engineering teams.",
+    proof: "Current production focus at Automatify.",
+  },
+  {
+    id: "02",
+    label: "REST / OAuth / UiPath",
+    title: "Integration & automation engineer",
+    description:
+      "I build integration-heavy systems with OAuth, pagination, rate-limit handling, queue retries, correlation IDs and production support discipline.",
+    proof: "4 enterprise systems delivered as solo developer.",
+  },
+  {
+    id: "03",
+    label: "Next.js / React Native",
+    title: "Product engineer",
+    description:
+      "I can move between web, mobile and backend workflows, shaping ambiguous product requirements into shipped interfaces and service boundaries.",
+    proof: "React Native/Expo mobile work plus full-stack product experiments.",
+  },
+  {
+    id: "04",
+    label: "Foundry / MCP / LLM APIs",
+    title: "AI workflow systems builder",
+    description:
+      "I integrate LLMs into useful internal tooling by wrapping model calls with validation, retries, structured outputs and operational visibility.",
+    proof: "Microsoft Foundry, MCP integrations and AI code review tooling.",
+  },
+];
+
+const proofPoints = [
+  {
+    value: "4",
+    label: "enterprise systems shipped",
+    detail: "Delivered end-to-end as solo developer, from requirements to production support.",
+  },
+  {
+    value: "Dev/UAT/Prod",
+    label: "release governance",
+    detail: "Package versioning, CI/CD release promotion and production-safe environment separation.",
+  },
+  {
+    value: "OAuth + queues",
+    label: "integration reliability",
+    detail: "Rate limits, pagination, retries/backoff, correlation IDs and audit-friendly logs.",
+  },
+  {
+    value: "C1+",
+    label: "client communication",
+    detail: "Near-native English for explaining technical decisions to non-technical stakeholders.",
+  },
+];
+
+const capabilities = [
+  {
+    id: "01",
+    label: "architecture to deployment",
+    title: "Full lifecycle ownership",
+    description:
+      "I am strongest in roles where one person needs to understand requirements, design the solution, implement it, release it and support it after production launch.",
+  },
+  {
+    id: "02",
+    label: "production integrations",
+    title: "Reliability-first integrations",
+    description:
+      "REST/OAuth integrations with explicit failure modes, retry boundaries, idempotency, structured logging and environment-specific credentials.",
+  },
+  {
+    id: "03",
+    label: "cloud and product",
+    title: "Cloud-backed product delivery",
+    description:
+      "Azure infrastructure, DevOps pipelines, React Native mobile apps, Next.js interfaces and backend workflows designed around practical delivery constraints.",
+  },
+  {
+    id: "04",
+    label: "ai workflows",
+    title: "Useful AI, not demos",
+    description:
+      "LLM/API integrations are treated as systems: schemas, validations, observability, user workflows and safe fallback behavior before visual novelty.",
+  },
+];
+
+const experience = [
+  {
+    role: "Software Engineer",
+    company: "Automatify",
+    period: "Mar 2026 — Present",
+    location: "Cluj-Napoca · Hybrid",
+    current: true,
+    points: [
+      "Architect, develop and manage Azure infrastructure using Container Apps, Key Vault and Azure DevOps pipelines.",
+      "Develop cross-platform mobile applications using React Native and Expo.",
+      "Build AI-powered workflow solutions using Microsoft Foundry and Model Context Protocol integrations.",
+    ],
+  },
+  {
+    role: "RPA Developer / Automation & Integration Engineer",
+    company: "Tquila Automation",
+    period: "Jul 2023 — Mar 2026",
+    location: "Romania · Remote",
+    current: false,
+    points: [
+      "Delivered 4 enterprise UiPath automations end-to-end as solo developer, from requirements and architecture through release and support.",
+      "Integrated REST APIs with OAuth, pagination, rate limiting, retries/backoff and structured telemetry for production reliability.",
+      "Managed UiPath Orchestrator queues, assets, credentials, triggers, schedules, folders and Dev/UAT/Prod CI/CD governance.",
+      "Standardized REFramework with idempotency, error taxonomy, correlation IDs and audit-friendly logs.",
+    ],
+  },
+];
+
+const stackGroups = [
+  {
+    label: "Cloud & DevOps",
+    items: ["Azure", "Container Apps", "Key Vault", "Azure DevOps", "Docker", "CI/CD"],
+  },
+  {
+    label: "Product Stack",
+    items: ["Next.js", "TypeScript", "React Native", "Expo", "React", "SQL"],
+  },
+  {
+    label: "Integrations & Automation",
+    items: ["REST APIs", "OAuth", "UiPath", "Orchestrator", "REFramework", "Structured Logs"],
+  },
+  {
+    label: "AI & Systems Track",
+    items: ["Microsoft Foundry", "MCP", "LLM APIs", "Go", "Rust", "WebAssembly"],
+  },
+];
+
+const sharpening = [
+  {
+    title: "Go backend systems",
+    evidence: "Boot.dev Go + HTTP Clients certifications; private Go microservices in Viver.",
+    items: ["HTTP clients", "service boundaries", "testing", "observability"],
+  },
+  {
+    title: "Rust and WebAssembly",
+    evidence: "Public Rust Cloud Terminal, CLI utilities and lower-level systems experiments.",
+    items: ["Axum", "Yew", "WASM", "memory-safe systems"],
+  },
+  {
+    title: "Operational AI workflows",
+    evidence: "AI code review server, Microsoft Foundry work and MCP integration path.",
+    items: ["structured outputs", "validation", "metrics", "tool integration"],
+  },
 ];
 ---
 
 <BaseLayout
-  title="Bogdan Stoica - UiPath RPA Engineer"
-  description="Automation engineer with 2.6+ years delivering end-to-end UiPath solutions"
+  title="Bogdan Stoica — Software Engineer"
+  description="Software Engineer in Cluj-Napoca building Azure cloud infrastructure, integration-heavy systems, React Native products and reliable AI workflow tooling."
 >
-  <!-- Hero Section - Terminal Style -->
-  <section class="hero">
-    <div class="container">
+  <!-- ===== HERO ===== -->
+  <section class="hero section" id="hero">
+    <div class="container hero-grid">
       <div class="hero-content animate-fade-in-up">
-        <div class="terminal-window">
-          <div class="terminal-header">
-            <span class="terminal-dot red"></span>
-            <span class="terminal-dot yellow"></span>
-            <span class="terminal-dot green"></span>
-            <span class="terminal-title">bogdan@portfolio:~</span>
-          </div>
-          <div class="terminal-body">
-            <div class="terminal-line">
-              <span class="prompt">$</span>
-              <span class="command">whoami</span>
-            </div>
-            <div class="terminal-output name-output">bogdan_stoica</div>
-
-            <div class="terminal-line">
-              <span class="prompt">$</span>
-              <span class="command">cat</span> title.txt
-            </div>
-            <div class="terminal-output title-output">UiPath RPA Engineer</div>
-
-            <div class="terminal-line">
-              <span class="prompt">$</span>
-              <span class="command">echo</span> $DESCRIPTION
-            </div>
-            <div class="terminal-output desc-output">
-              Automation engineer with 2.6+ years delivering<br />
-              end-to-end UiPath solutions: REFramework,<br />
-              API integrations, Orchestrator governance.
-            </div>
-
-            <div class="terminal-line">
-              <span class="prompt">$</span>
-              <span class="cursor-blink">█</span>
-            </div>
-          </div>
-        </div>
+        <span class="technical-label">Software Engineer · Azure · Integrations · Product</span>
+        <h1>I build integration-heavy cloud products from architecture to production.</h1>
+        <p class="hero-lead">
+          Based in Cluj-Napoca, I help teams ship systems that need more than UI polish:
+          Azure infrastructure, deployment pipelines, REST/OAuth integrations, React Native products and AI workflow tooling that can be operated in production.
+        </p>
 
         <div class="hero-actions">
-          <a href="/projects" class="btn btn-primary">$ ls ./projects</a>
-          <a href="/blog" class="btn btn-secondary">$ cat blog/*</a>
+          <a href="mailto:bogdan10andrei@gmail.com?subject=Intro%20call%20-%20software%20engineering%20opportunity" class="btn btn-primary">
+            book intro call
+          </a>
+          <a href="/cv" class="btn btn-secondary">view cv</a>
+          <a href="/projects" class="btn btn-secondary">project evidence</a>
+        </div>
+
+        <div class="hero-credentials" aria-label="Profile highlights">
+          <span class="cred-item">Open to B2B / contract / full-time</span>
+          <span class="cred-sep">·</span>
+          <span class="cred-item">4 enterprise systems shipped</span>
+          <span class="cred-sep">·</span>
+          <span class="cred-item">English C1 near-native</span>
         </div>
       </div>
 
-      <div class="hero-visual animate-float">
-        <div class="hero-card glass">
-          <div class="hero-photo">
-            <img src="/images/profile.jpg" alt="Bogdan Stoica" />
+      <div class="hero-visual animate-fade-in-up stagger-1">
+        <div class="dossier-card card">
+          <div class="dossier-photo-container">
+            <img src="/images/profile.jpg" alt="Bogdan Stoica" class="dossier-photo" />
           </div>
-          <div class="hero-card-header">
-            <span class="status-dot"></span>
-            <span class="status-text">[ONLINE] Ready for opportunities</span>
-          </div>
-          <div class="hero-stats">
-            <div class="stat">
-              <span class="stat-value">2.6+</span>
-              <span class="stat-label">years_exp</span>
+          <div class="dossier-meta">
+            <div class="meta-row">
+              <span class="meta-label">ENGAGEMENT</span>
+              <span class="meta-value text-accent">OPEN TO OPPORTUNITIES</span>
             </div>
-            <div class="stat">
-              <span class="stat-value">4+</span>
-              <span class="stat-label">automations</span>
+            <div class="meta-row">
+              <span class="meta-label">ROLE</span>
+              <span class="meta-value">SOFTWARE ENGINEER</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">BEST FIT</span>
+              <span class="meta-value">CLOUD / INTEGRATIONS / AI</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">LOCATION</span>
+              <span class="meta-value">CLUJ-NAPOCA, RO</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-label">EDUCATION</span>
+              <span class="meta-value">MSC COMPUTER SCIENCE</span>
             </div>
           </div>
         </div>
@@ -96,19 +227,48 @@ const skills = [
     </div>
   </section>
 
-  <!-- Skills Section - Terminal Style -->
-  <section class="section skills-section">
+  <!-- ===== HIRE ME FOR ===== -->
+  <section class="section" id="hire-me-for">
     <div class="container">
-      <div class="section-header terminal-header-section">
-        <h2><span class="prompt-header">$</span> cat skills.log</h2>
-        <p class="terminal-comment"># Core competencies I work with daily</p>
+      <span class="technical-label">Hire me for</span>
+      <div class="section-heading-row">
+        <h2 class="section-title">Clear fit for contract, B2B and engineering team roles.</h2>
+        <p class="section-intro compact">
+          The fastest way to evaluate me: these are the problems where my experience maps directly to business value.
+        </p>
       </div>
 
-      <div class="skills-grid">
+      <div class="engagement-grid">
         {
-          skills.map((skill, index) => (
-            <div class={`skill-item stagger-${index + 1}`}>
-              <SkillBar name={skill.name} level={skill.level} />
+          engagementFit.map((item) => (
+            <article class="engagement-card card">
+              <div class="cap-header">
+                <span class="cap-id">{item.id}.</span>
+                <span class="cap-label">{item.label}</span>
+              </div>
+              <h3>{item.title}</h3>
+              <p>{item.description}</p>
+              <div class="proof-chip">{item.proof}</div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PROOF STRIP ===== -->
+  <section class="section proof-section" id="proof">
+    <div class="container">
+      <span class="technical-label">Proof points</span>
+      <h2 class="section-title">Operational maturity, not just implementation speed.</h2>
+
+      <div class="proof-grid">
+        {
+          proofPoints.map((item) => (
+            <div class="proof-card card">
+              <strong>{item.value}</strong>
+              <span>{item.label}</span>
+              <p>{item.detail}</p>
             </div>
           ))
         }
@@ -116,55 +276,203 @@ const skills = [
     </div>
   </section>
 
-  <!-- Experience Timeline -->
-  <section class="section experience-section">
+  <!-- ===== CAPABILITIES ===== -->
+  <section class="section" id="capabilities">
     <div class="container">
-      <div class="section-header terminal-header-section">
-        <h2><span class="prompt-header">$</span> git log --experience</h2>
-        <p class="terminal-comment"># My professional journey</p>
-      </div>
+      <span class="technical-label">Capabilities</span>
+      <h2 class="section-title">Systems that bridge product, cloud and operations.</h2>
+      <p class="section-intro">
+        I operate best when the work requires engineering judgment across architecture, setup, implementation, release flow and long-term production behavior.
+      </p>
 
-      <Timeline />
+      <div class="capabilities-grid">
+        {
+          capabilities.map((item) => (
+            <div class="capability-card card">
+              <div class="cap-header">
+                <span class="cap-id">{item.id}.</span>
+                <span class="cap-label">{item.label}</span>
+              </div>
+              <h3>{item.title}</h3>
+              <p>{item.description}</p>
+            </div>
+          ))
+        }
+      </div>
     </div>
   </section>
 
-  <!-- CV Content Sections -->
-  <section class="section cv-sections">
+  <!-- ===== EXPERIENCE ===== -->
+  <section class="section" id="experience">
     <div class="container">
-      {
-        sortedSections.map(async (section) => {
-          const { Content } = await section.render();
-          return (
-            <div class="cv-section card animate-fade-in-up">
-              <div class="cv-section-content prose">
-                <Content />
+      <span class="technical-label">Experience</span>
+      <h2 class="section-title">Recent roles and delivery evidence.</h2>
+
+      <div class="timeline-container">
+        <div class="timeline-line"></div>
+        <div class="timeline-list">
+          {
+            experience.map((item) => (
+              <div class="timeline-item">
+                <div class="timeline-marker">
+                  <div class="marker-dot"></div>
+                </div>
+                <div class="timeline-card-wrapper">
+                  <div class="timeline-entry card">
+                    <div class="timeline-meta">
+                      <span class="timeline-period">{item.period}</span>
+                      {item.current && <span class="timeline-current">Active</span>}
+                    </div>
+                    <div class="timeline-content">
+                      <h3>{item.role}</h3>
+                      <p class="timeline-company">{item.company} · <span class="loc">{item.location}</span></p>
+                      <ul class="timeline-points">
+                        {item.points.map((point) => (
+                          <li>{point}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== STACK ===== -->
+  <section class="section" id="stack">
+    <div class="container">
+      <span class="technical-label">Technical Stack</span>
+      <h2 class="section-title">Technical environment.</h2>
+
+      <div class="stack-grid">
+        {
+          stackGroups.map((group) => (
+            <div class="stack-card card">
+              <div class="stack-card-header">
+                <span class="stack-label-text">{group.label}</span>
+              </div>
+              <div class="stack-chips">
+                {group.items.map((item) => (
+                  <span class="tag">{item}</span>
+                ))}
               </div>
             </div>
-          );
-        })
-      }
+          ))
+        }
+      </div>
     </div>
   </section>
 
-  <!-- CTA Section - Terminal Style -->
-  <section class="section cta-section">
+  <!-- ===== CURRENT TECHNICAL DEEPENING ===== -->
+  <section class="section" id="sharpening">
     <div class="container">
-      <div class="cta-card">
-        <div class="cta-terminal">
-          <div class="cta-line">
-            <span class="prompt">$</span>
-            <span class="command">echo</span> "Let's collaborate!"
+      <span class="technical-label">Current technical deepening</span>
+      <h2 class="section-title">Evidence-based learning track.</h2>
+      <p class="section-intro">
+        Instead of percentage-based self-ratings, I prefer to show what I am building and studying publicly.
+      </p>
+      
+      <div class="sharpening-grid">
+        {
+          sharpening.map((item) => (
+            <article class="sharpening-card card">
+              <h3>{item.title}</h3>
+              <p>{item.evidence}</p>
+              <div class="sharpening-tags">
+                {item.items.map((tag) => <span class="tag">{tag}</span>)}
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PROJECTS ===== -->
+  <section class="section" id="projects">
+    <div class="container">
+      <span class="technical-label">Selected Work</span>
+      <h2 class="section-title">Project evidence and anonymized case studies.</h2>
+      <p class="section-intro">
+        Selected work showing integration reliability, product engineering, cloud-backed systems and AI workflow tooling.
+      </p>
+
+      <div class="homepage-projects-grid">
+        {
+          featuredProjects.map((project) => (
+            <ProjectCard
+              title={project.data.title}
+              description={project.data.description}
+              technologies={project.data.technologies}
+              slug={project.id}
+              githubUrl={project.data.githubUrl}
+              liveUrl={project.data.liveUrl}
+              coverImage={project.data.coverImage}
+              outcome={project.data.outcome}
+              featured={project.data.featured}
+            />
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== EDUCATION ===== -->
+  <section class="section" id="education">
+    <div class="container education-grid">
+      <div>
+        <span class="technical-label">Education</span>
+        <h2 class="section-title">Academic history and technical foundation.</h2>
+      </div>
+      <div class="education-card card">
+        <div class="edu-item">
+          <div class="edu-header">
+            <h3>Master's Degree in Computer Science</h3>
+            <span class="edu-date">2025 — 2027</span>
           </div>
-          <div class="cta-output">
-            &gt; I'm always open to new projects and interesting collaborations.
-          </div>
+          <p class="edu-meta">Babeș-Bolyai University, Cluj-Napoca, Romania</p>
+          <p class="edu-desc">Focus on systems design, practical software engineering, Go and distributed systems.</p>
         </div>
-        <div class="cta-buttons">
-          <a href="mailto:bogdan10andrei@gmail.com" class="btn btn-primary">
-            $ mail --send
+        
+        <div class="edu-divider"></div>
+
+        <div class="edu-item">
+          <div class="edu-header">
+            <h3>Bachelor's Degree in Computer Science</h3>
+            <span class="edu-date">2022 — 2025</span>
+          </div>
+          <p class="edu-meta">Babeș-Bolyai University, Cluj-Napoca, Romania</p>
+          <p class="edu-desc">Core coursework in algorithms, operating systems, databases and software design.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT ===== -->
+  <section class="section" id="contact">
+    <div class="container">
+      <div class="contact-block card">
+        <span class="technical-label">Contact</span>
+        <h2>Need someone to own a cloud setup, integration workflow or product build?</h2>
+        <p>
+          I am open to contract engagements, B2B consulting, cloud architecture setups, internal workflow tooling and full-time software engineering roles. References available on request.
+        </p>
+        <div class="contact-actions">
+          <a href="mailto:bogdan10andrei@gmail.com?subject=Software%20engineering%20opportunity" class="btn btn-primary">
+            book intro call
           </a>
-          <a href="/Resume.pdf" download class="btn btn-secondary">
-            $ wget resume.pdf
+          <a href="/cv" class="btn btn-secondary">view cv</a>
+          <a
+            href="https://www.linkedin.com/in/bogdan-stoica-aa415820a/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-secondary"
+          >
+            linkedin profile
           </a>
         </div>
       </div>
@@ -173,373 +481,587 @@ const skills = [
 </BaseLayout>
 
 <style>
-  /* Hero - Terminal Style */
+  /* ===== HERO ===== */
+
   .hero {
-    min-height: calc(100vh - 200px);
-    display: flex;
-    align-items: center;
-    padding: var(--space-16) 0;
+    padding-top: clamp(100px, 12vw, 150px);
+    padding-bottom: clamp(48px, 6vw, 80px);
   }
 
-  .hero .container {
+  .hero-grid {
     display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: var(--space-12);
+    grid-template-columns: 1.25fr 1fr;
+    gap: 48px;
     align-items: center;
   }
 
-  /* Terminal Window */
-  .terminal-window {
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    box-shadow: 0 0 40px rgba(0, 255, 65, 0.1);
+  .hero-content h1 {
+    margin-bottom: 20px;
+    font-size: var(--text-5xl);
   }
 
-  .terminal-header {
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-    padding: var(--space-3) var(--space-4);
-    background: rgba(0, 0, 0, 0.4);
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .terminal-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-  }
-
-  .terminal-dot.red {
-    background: #ff5f56;
-  }
-  .terminal-dot.yellow {
-    background: #ffbd2e;
-  }
-  .terminal-dot.green {
-    background: #27c93f;
-  }
-
-  .terminal-title {
-    margin-left: var(--space-4);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    color: var(--color-text-muted);
-  }
-
-  .terminal-body {
-    padding: var(--space-6);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    line-height: 1.8;
-  }
-
-  .terminal-line {
-    margin-bottom: var(--space-2);
-  }
-
-  .prompt {
-    color: var(--color-primary);
-    font-weight: bold;
-  }
-
-  .command {
-    color: var(--color-accent);
-  }
-
-  .terminal-output {
+  .hero-lead {
+    max-width: 660px;
+    font-size: clamp(1rem, 1.8vw, 1.15rem);
     color: var(--color-text-secondary);
-    padding-left: var(--space-4);
-    margin-bottom: var(--space-4);
-  }
-
-  .name-output {
-    color: var(--color-primary);
-    font-size: var(--text-2xl);
-    font-weight: bold;
-    text-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
-  }
-
-  .title-output {
-    color: var(--color-accent);
-    font-size: var(--text-xl);
-  }
-
-  .desc-output {
-    color: var(--color-text-secondary);
-    font-size: var(--text-sm);
-    line-height: 1.6;
-  }
-
-  .cursor-blink {
-    color: var(--color-primary);
-    animation: blink 1s step-end infinite;
-  }
-
-  @keyframes blink {
-    0%,
-    100% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0;
-    }
+    margin-bottom: 32px;
   }
 
   .hero-actions {
     display: flex;
-    gap: var(--space-4);
     flex-wrap: wrap;
-    margin-top: var(--space-6);
+    gap: 16px;
+    margin-bottom: 40px;
   }
 
-  .hero-actions .btn {
-    font-family: var(--font-mono);
-  }
-
-  .hero-visual {
+  .hero-credentials {
     display: flex;
-    justify-content: center;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-text-muted);
   }
 
-  .hero-card {
-    padding: var(--space-8);
-    border-radius: var(--radius-lg);
-    min-width: 280px;
-    text-align: center;
+  .cred-sep {
+    color: var(--color-accent);
+  }
+
+  .dossier-card {
+    padding: 16px;
+    background: var(--color-bg-raised);
     border: 1px solid var(--color-border);
-    background: rgba(0, 255, 65, 0.02);
+    max-width: 380px;
+    margin: 0 auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   }
 
-  .hero-photo {
-    width: 150px;
-    height: 150px;
-    margin: 0 auto var(--space-6);
-    border-radius: 50%;
+  .dossier-photo-container {
+    width: 100%;
+    aspect-ratio: 1.1 / 1;
     overflow: hidden;
-    border: 3px solid var(--color-primary);
-    box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(56, 189, 248, 0.15);
+    margin-bottom: 16px;
+    background: #0d111b;
   }
 
-  .hero-photo img {
+  .dossier-photo {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    filter: saturate(0.8) contrast(1.1);
+    object-position: center top;
+    filter: saturate(0.85) contrast(1.05);
   }
 
-  .hero-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-2);
-    font-size: var(--text-sm);
-    font-family: var(--font-mono);
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-6);
-  }
-
-  .status-dot {
-    width: 8px;
-    height: 8px;
-    background: var(--color-primary);
-    border-radius: 50%;
-    animation: pulse 2s ease-in-out infinite;
-    box-shadow: 0 0 10px var(--color-primary);
-  }
-
-  .status-text {
-    color: var(--color-primary);
-  }
-
-  @keyframes pulse {
-    0%,
-    100% {
-      opacity: 1;
-      box-shadow: 0 0 10px var(--color-primary);
-    }
-    50% {
-      opacity: 0.7;
-      box-shadow: 0 0 20px var(--color-primary);
-    }
-  }
-
-  .hero-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-6);
-  }
-
-  .stat {
-    text-align: center;
-  }
-
-  .stat-value {
-    display: block;
-    font-family: var(--font-mono);
-    font-size: var(--text-4xl);
-    font-weight: 700;
-    color: var(--color-primary);
-    text-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
-  }
-
-  .stat-label {
-    font-size: var(--text-sm);
-    font-family: var(--font-mono);
-    color: var(--color-text-muted);
-  }
-
-  /* Sections */
-  .section {
-    padding: var(--space-20) 0;
-  }
-
-  /* Terminal Section Headers */
-  .terminal-header-section h2 {
-    font-family: var(--font-mono);
-    font-size: var(--text-2xl);
-    display: flex;
-    align-items: center;
-    gap: var(--space-2);
-  }
-
-  .prompt-header {
-    color: var(--color-primary);
-    font-weight: bold;
-  }
-
-  .terminal-comment {
-    font-family: var(--font-mono);
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
-    margin-top: var(--space-2);
-  }
-
-  /* Skills */
-  .skills-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-    gap: var(--space-4);
-  }
-
-  .skill-item {
-    opacity: 0;
-    animation: fadeInUp 0.5s ease forwards;
-  }
-
-  .skill-item {
-    opacity: 0;
-    animation: fadeInUp 0.5s ease forwards;
-  }
-
-  /* CV Sections */
-  .cv-sections .container {
+  .dossier-meta {
     display: flex;
     flex-direction: column;
-    gap: 48px;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
   }
 
-  .cv-section {
+  .meta-row {
     display: flex;
-    gap: var(--space-6);
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.04);
   }
 
-  .cv-section-content {
-    flex: 1;
+  .meta-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
   }
 
-  /* Prose styles for MDX content */
-  .prose :global(h1),
-  .prose :global(h2),
-  .prose :global(h3) {
-    margin-top: var(--space-6);
-    margin-bottom: var(--space-4);
+  .meta-label {
+    color: var(--color-text-muted);
   }
 
-  .prose :global(h1:first-child),
-  .prose :global(h2:first-child) {
-    margin-top: 0;
+  .meta-value {
+    color: var(--color-text);
+    font-weight: 500;
+    text-align: right;
   }
 
-  .prose :global(p) {
-    margin-bottom: var(--space-4);
+  /* ===== SECTION UTILITIES ===== */
+
+  .section-title {
+    margin-bottom: 16px;
+    max-width: 820px;
   }
 
-  .prose :global(ul),
-  .prose :global(ol) {
-    margin-bottom: var(--space-4);
-    padding-left: var(--space-6);
+  .section-intro {
+    max-width: 700px;
+    margin-bottom: 48px;
   }
 
-  .prose :global(li) {
-    margin-bottom: var(--space-2);
+  .section-intro.compact {
+    margin-bottom: 0;
+  }
+
+  .section-heading-row {
+    display: grid;
+    grid-template-columns: 1fr 0.85fr;
+    gap: 32px;
+    align-items: end;
+    margin-bottom: 48px;
+  }
+
+  /* ===== HIRE ME FOR ===== */
+
+  .engagement-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .engagement-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    min-height: 300px;
+  }
+
+  .engagement-card h3 {
+    margin-bottom: 12px;
+    font-size: 17px;
+  }
+
+  .engagement-card p {
+    font-size: 14px;
+    line-height: 1.6;
     color: var(--color-text-secondary);
   }
 
-  .prose :global(hr) {
-    border: none;
-    height: 1px;
-    background: var(--color-border);
-    margin: var(--space-8) 0;
+  .proof-chip {
+    margin-top: auto;
+    padding-top: 18px;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.5;
   }
 
-  .prose :global(strong) {
-    color: var(--color-text-primary);
+  /* ===== PROOF ===== */
+
+  .proof-section {
+    padding-top: clamp(44px, 6vw, 70px);
+  }
+
+  .proof-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  .proof-card {
+    padding: 22px;
+  }
+
+  .proof-card strong {
+    display: block;
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .proof-card span {
+    display: block;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+
+  .proof-card p {
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  /* ===== CAPABILITIES ===== */
+
+  .capabilities-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .capability-card {
+    padding: 28px;
+  }
+
+  .cap-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    margin-bottom: 20px;
+  }
+
+  .cap-id {
+    color: var(--color-accent);
     font-weight: 600;
   }
 
-  /* CTA */
-  .cta-card {
-    text-align: center;
-    padding: var(--space-16);
-    border-radius: var(--radius-2xl);
+  .cap-label {
+    color: var(--color-text-muted);
+    text-align: right;
   }
 
-  .cta-card h2 {
-    margin-bottom: var(--space-4);
+  .capability-card h3 {
+    margin-bottom: 12px;
+    font-size: 18px;
   }
 
-  .cta-card p {
-    margin-bottom: var(--space-8);
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
+  .capability-card p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-secondary);
   }
 
-  .cta-buttons {
+  /* ===== TIMELINE / EXPERIENCE ===== */
+
+  .timeline-container {
+    position: relative;
+    max-width: 860px;
+    margin: 40px 0 0 10px;
+  }
+
+  .timeline-line {
+    position: absolute;
+    left: 10px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-image: linear-gradient(to bottom, var(--color-accent) 0%, rgba(56, 189, 248, 0.05) 100%);
+  }
+
+  .timeline-list {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .timeline-item {
+    display: flex;
+    gap: 24px;
+    position: relative;
+  }
+
+  .timeline-marker {
+    width: 21px;
     display: flex;
     justify-content: center;
-    gap: var(--space-4);
-    flex-wrap: wrap;
+    align-items: flex-start;
+    padding-top: 24px;
   }
 
-  @media (max-width: 768px) {
-    .hero .container {
+  .marker-dot {
+    width: 9px;
+    height: 9px;
+    background: var(--color-bg);
+    border: 2px solid var(--color-accent);
+    border-radius: 50%;
+    z-index: 2;
+    box-shadow: 0 0 6px var(--color-accent);
+  }
+
+  .timeline-card-wrapper {
+    flex: 1;
+  }
+
+  .timeline-entry {
+    padding: 24px;
+  }
+
+  .timeline-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  .timeline-period {
+    color: var(--color-text-muted);
+  }
+
+  .timeline-current {
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+    padding: 1px 6px;
+    border-radius: 2px;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .timeline-content h3 {
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+
+  .timeline-company {
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .timeline-company .loc {
+    color: var(--color-text-muted);
+    font-weight: 400;
+    font-size: 12px;
+  }
+
+  .timeline-points {
+    padding-left: 14px;
+    display: grid;
+    gap: 10px;
+  }
+
+  .timeline-points li {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    line-height: 1.55;
+  }
+
+  /* ===== STACK ===== */
+
+  .stack-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .stack-card {
+    padding: 20px;
+    border-top: 2px solid var(--color-border);
+  }
+
+  .stack-card:hover {
+    border-top-color: var(--color-accent);
+  }
+
+  .stack-card-header {
+    margin-bottom: 16px;
+  }
+
+  .stack-label-text {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .stack-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* ===== SHARPENING ===== */
+
+  .sharpening-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .sharpening-card {
+    padding: 24px;
+  }
+
+  .sharpening-card h3 {
+    font-size: 17px;
+    margin-bottom: 12px;
+  }
+
+  .sharpening-card p {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 18px;
+  }
+
+  .sharpening-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  /* ===== SELECTED PROJECTS ===== */
+
+  .homepage-projects-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  /* ===== EDUCATION ===== */
+
+  .education-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 40px;
+  }
+
+  .education-card {
+    padding: 32px;
+  }
+
+  .edu-item {
+    display: grid;
+    gap: 8px;
+  }
+
+  .edu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .edu-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .edu-date {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-accent);
+  }
+
+  .edu-meta {
+    color: var(--color-text-muted);
+    font-size: 13px;
+  }
+
+  .edu-desc {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .edu-divider {
+    height: 1px;
+    border-top: 1px dashed rgba(255, 255, 255, 0.04);
+    margin: 24px 0;
+  }
+
+  /* ===== CONTACT ===== */
+
+  .contact-block {
+    padding: 40px;
+    max-width: 860px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .contact-block h2 {
+    font-size: 28px;
+    margin: 12px 0 16px;
+    letter-spacing: -0.02em;
+  }
+
+  .contact-block p {
+    font-size: 15px;
+    max-width: 640px;
+    margin: 0 auto 32px;
+    line-height: 1.65;
+  }
+
+  .contact-block .technical-label {
+    justify-content: center;
+  }
+
+  .contact-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  /* ===== RESPONSIVE ===== */
+
+  @media (max-width: 1080px) {
+    .engagement-grid,
+    .proof-grid,
+    .stack-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 980px) {
+    .hero-grid {
       grid-template-columns: 1fr;
+      gap: 40px;
       text-align: center;
     }
 
-    .hero-title {
-      font-size: var(--text-4xl);
-    }
-
-    .hero-subtitle {
-      font-size: var(--text-2xl);
-    }
-
-    .hero-description {
+    .hero-lead {
       margin-left: auto;
       margin-right: auto;
     }
 
-    .hero-actions {
+    .hero-actions,
+    .hero-credentials {
       justify-content: center;
     }
 
-    .cv-section {
+    .dossier-card {
+      max-width: 340px;
+    }
+
+    .section-heading-row,
+    .capabilities-grid,
+    .sharpening-grid,
+    .education-grid {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .section-intro.compact {
+      margin-bottom: 0;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero {
+      padding-top: 80px;
+    }
+
+    .engagement-grid,
+    .proof-grid,
+    .stack-grid,
+    .homepage-projects-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .engagement-card {
+      min-height: auto;
+    }
+
+    .edu-header {
       flex-direction: column;
+      gap: 4px;
+    }
+
+    .contact-block {
+      padding: 28px 20px;
     }
   }
 </style>
