@@ -34,7 +34,7 @@ const {
     <div class="project-content">
       <div class="project-header">
         {featured && <span class="featured-badge">Featured Build</span>}
-        <h3>{title}</h3>
+        <h3 transition:name={`project-${slug}`}>{title}</h3>
       </div>
       <p>{description}</p>
       {outcome && <p class="project-outcome"><span>Outcome</span>{outcome}</p>}
@@ -64,8 +64,8 @@ const {
   }
 
   .project-card.featured {
-    border-color: rgba(56, 189, 248, 0.2);
-    box-shadow: 0 4px 24px rgba(56, 189, 248, 0.02);
+    border-color: var(--color-border-hover);
+    box-shadow: none;
   }
 
   .project-main {
@@ -80,7 +80,7 @@ const {
     aspect-ratio: 16 / 9;
     overflow: hidden;
     border-bottom: 1px solid var(--color-border);
-    background: #0d111b;
+    background: var(--color-bg-raised);
   }
 
   .project-img {
@@ -163,7 +163,7 @@ const {
     gap: 16px;
     padding: 16px 24px;
     border-top: 1px solid var(--color-border);
-    background: rgba(14, 19, 32, 0.15);
+    background: transparent;
     font-family: var(--font-primary);
   }
 

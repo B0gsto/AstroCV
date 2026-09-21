@@ -1,0 +1,45 @@
+---
+title: "Letting the model decide: AI as the decision-maker in an invoice manager"
+description: "What the model is allowed to decide, what it isn't, and how every decision stays auditable."
+publishDate: 2026-09-14
+category: "AI systems"
+tags: ["llm", "ai workflows", "automation", "dynamics 365"]
+draft: false
+---
+
+Most "AI document processing" stops at extraction: the model reads the invoice, returns fields, and a rules engine takes over. In the vendor invoice manager I'm building, the model goes one step further. It makes decisions: which route a document takes, whether the extraction can be trusted, who needs to look at it.
+
+That only works if the system around the model is strict about what a decision is.
+
+## A decision is a typed value, not a paragraph
+
+The model never answers in prose. Every decision point has a schema: a closed set of options, the fields that support the choice, and a short reason. The output is validated before anything acts on it. If it doesn't parse, or it picks an option that doesn't exist, that isn't a decision. It's an error, and errors have their own path.
+
+This sounds obvious and is the single thing that makes the rest possible. A model that can only say `approve_route: "manager"` can be tested, logged, counted and overruled. A model that writes "I think this should probably go to the manager" can't.
+
+## The model proposes, deterministic code disposes
+
+Some things are not up to the model, however confident it is:
+
+- **Arithmetic.** Line items either add up to the total or they don't. Code checks that.
+- **Identity.** A vendor either matches a record in the ERP or it doesn't.
+- **Duplicates.** The same invoice number from the same vendor is a duplicate, whatever the model feels about it.
+- **Limits.** Approval thresholds are business policy. They live in configuration, not in a prompt.
+
+The model gets the judgement calls that rules handle badly: is this document an invoice at all, which of two plausible vendors is meant, does this line belong to that cost category. Rules get everything that has a right answer.
+
+## Doubt is a first-class outcome
+
+Every decision schema includes a way to say "I'm not sure". When the model takes it, or when a deterministic check disagrees with the model, the document goes to a person, with the specific question attached rather than a generic "please review".
+
+The same idea applies one level down. When LLM extraction isn't trustworthy for a document, the pipeline falls back to Azure Document Intelligence rather than pushing a shaky result forward.
+
+## Every decision leaves a trace
+
+For each decision I store the input it saw, the option it chose, its stated reason and the version of the prompt that produced it, all under the document's correlation ID. When someone asks "why did this invoice go there?", the answer is a lookup.
+
+It also makes change safe. A new prompt version can be run against past documents and compared with what actually happened before it decides anything real.
+
+## The human is part of the design
+
+The approval step isn't a fallback for when the AI fails. It's where accountability sits. The system's job is to make that step fast: values extracted, source regions highlighted on the PDF, the model's reasoning one click away. The person decides in seconds because everything they need is already on the screen.

@@ -3,6 +3,7 @@ import Header from "../components/layout/Header.astro";
 import Footer from "../components/layout/Footer.astro";
 import "../styles/global.css";
 import "../styles/animations.css";
+import { ClientRouter } from "astro:transitions";
 
 interface Props {
   title: string;
@@ -45,6 +46,9 @@ const personJsonLd = {
     "React Native",
     "REST API integrations",
     "OAuth",
+    "AI document automation",
+    "Azure Document Intelligence",
+    "Dynamics 365",
     "AI workflow systems",
     "DevOps",
   ],
@@ -63,7 +67,7 @@ const personJsonLd = {
     <meta name="description" content={description} />
     {robots && <meta name="robots" content={robots} />}
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#07111f" />
+    <meta name="theme-color" content="#ffffff" />
 
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -80,21 +84,33 @@ const personJsonLd = {
 
     <script type="application/ld+json" set:html={JSON.stringify(personJsonLd)}></script>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Arms scroll reveals only when JS runs, so content is never hidden without a way back -->
+    <script is:inline>
+      // "js" lets CSS hide content that is waiting to be revealed. If the motion
+      // module has not reported in shortly after, show everything: content must
+      // never depend on a script arriving.
+      (function () {
+        var root = document.documentElement;
+        var arm = function () {
+          root.classList.add("js");
+          setTimeout(function () {
+            if (!window.__motionReady) root.classList.remove("js");
+          }, 2500);
+        };
+        arm();
+        document.addEventListener("astro:after-swap", function () {
+          if (window.__motionReady) root.classList.add("js");
+          else arm();
+        });
+      })();
+    </script>
+    <ClientRouter />
 
     <link rel="canonical" href={canonicalURL} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
   </head>
   <body>
-    <!-- Background Canvas for ASCII cursor trails -->
-    <canvas id="ascii-canvas"></canvas>
-
     <div class="site-shell">
       <Header />
       <main class="main page-transition">
@@ -103,93 +119,8 @@ const personJsonLd = {
       <Footer />
     </div>
 
-    <!-- Inline script to ensure direct, instant client execution -->
-    <script is:inline>
-      (function() {
-        const canvas = document.getElementById('ascii-canvas');
-        if (!canvas) return;
-
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-
-        // Safety check for user preferences regarding motion
-        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (reducedMotion) return;
-
-        let particles = [];
-        const chars = ['0', '1', '{', '}', '[', ']', '+', '-', '*', '/', ';', '<', '>', '&', '|', '~', '^', '%'];
-        let mouseX = 0;
-        let mouseY = 0;
-        let lastSpawn = 0;
-
-        function resize() {
-          canvas.width = window.innerWidth;
-          canvas.height = window.innerHeight;
-        }
-
-        resize();
-        window.addEventListener('resize', resize);
-
-        window.addEventListener('mousemove', function(e) {
-          mouseX = e.clientX;
-          mouseY = e.clientY;
-
-          const now = Date.now();
-          if (now - lastSpawn > 35) { // spawn particle every 35ms
-            spawn(mouseX, mouseY, true);
-            lastSpawn = now;
-          }
-        });
-
-        // Background passive drift particles
-        const passiveInterval = setInterval(function() {
-          if (particles.length < 20) {
-            spawn(
-              Math.random() * window.innerWidth,
-              Math.random() * window.innerHeight,
-              false
-            );
-          }
-        }, 750);
-
-        function spawn(x, y, isMouse) {
-          const char = chars[Math.floor(Math.random() * chars.length)];
-          particles.push({
-            x: x,
-            y: y,
-            char: char,
-            size: isMouse ? 12 + Math.random() * 8 : 8 + Math.random() * 4,
-            vx: (Math.random() - 0.5) * 0.4,
-            vy: -0.2 - Math.random() * 0.35, // floating up vector
-            alpha: isMouse ? 0.35 : 0.12, // elevated alpha to render clearly against dark background
-            decay: isMouse ? 0.005 : 0.002
-          });
-        }
-
-        function animate() {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-          for (let i = particles.length - 1; i >= 0; i--) {
-            const p = particles[i];
-            p.x += p.vx;
-            p.y += p.vy;
-            p.alpha -= p.decay;
-
-            if (p.alpha <= 0 || p.x < 0 || p.x > canvas.width || p.y < 0) {
-              particles.splice(i, 1);
-              continue;
-            }
-
-            ctx.fillStyle = 'rgba(56, 189, 248, ' + p.alpha + ')'; // sky-blue accent
-            ctx.font = p.size + 'px Courier New, monospace';
-            ctx.fillText(p.char, p.x, p.y);
-          }
-
-          requestAnimationFrame(animate);
-        }
-
-        animate();
-      })();
+    <script>
+      import "../scripts/motion.js";
     </script>
   </body>
 </html>
@@ -199,25 +130,10 @@ const personJsonLd = {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    position: relative;
-    z-index: 10;
   }
 
   .main {
     flex: 1;
-    padding-top: 64px;
-  }
-
-  #ascii-canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 1;
-    pointer-events: none;
-    display: block;
-    /* CSS opacity set to 1 so particle rendering is controlled purely via JS alpha values */
-    opacity: 1;
+    padding-top: var(--header-height);
   }
 </style>

@@ -1,0 +1,340 @@
+---
+// Live demo for the bounding-box post. Pure CSS: the fields auto-cycle until the
+// reader hovers or focuses one, then :has() links each field to its region.
+// The page is drawn on a 420x560 grid (A4 at ~50.8px per inch) and scales with cqw.
+
+const PAGE_W = 420;
+const PAGE_H = 560;
+const PX_PER_INCH = 50.8;
+
+const u = (px: number) => `${+((px / PAGE_W) * 100).toFixed(3)}cqw`;
+const pctX = (px: number) => `${+((px / PAGE_W) * 100).toFixed(3)}%`;
+const pctY = (px: number) => `${+((px / PAGE_H) * 100).toFixed(3)}%`;
+const at = (l: number, t: number) => `left:${pctX(l)};top:${pctY(t)};`;
+const rect = (l: number, t: number, w: number, h: number) =>
+  `${at(l, t)}width:${pctX(w)};height:${pctY(h)};`;
+const inch = (px: number) => (px / PX_PER_INCH).toFixed(2);
+
+const fields = [
+  { name: "VendorName", value: "Nordwind Supply", l: 32, t: 84, w: 200, h: 48 },
+  { name: "InvoiceId", value: "INV-2041", l: 262, t: 30, w: 126, h: 28 },
+  { name: "InvoiceDate", value: "2026-09-02", l: 262, t: 84, w: 126, h: 28 },
+  { name: "PaymentIban", value: "DE00 0000 …", l: 32, t: 452, w: 262, h: 28 },
+  { name: "InvoiceTotal", value: "1284.00 EUR", l: 242, t: 392, w: 146, h: 34 },
+].map((f, i) => {
+  const [x1, y1, x2, y2] = [f.l, f.t, f.l + f.w, f.t + f.h].map(inch);
+  return { ...f, n: i + 1, polygon: [`[${x1}, ${y1}, ${x2}, ${y1},`, ` ${x2}, ${y2}, ${x1}, ${y2}]`] };
+});
+
+const tableRows = [
+  [190, 52],
+  [150, 44],
+  [210, 58],
+  [124, 48],
+];
+
+// one :has() rule set per field, generated so the list above stays the single source
+const linkCss = fields
+  .map(
+    ({ n }) => `
+.pdf-demo:has(.pdf-f${n}:hover) .pdf-b${n},.pdf-demo:has(.pdf-f${n}:focus) .pdf-b${n},
+.pdf-demo:has(.pdf-f${n}:hover) .pdf-p${n},.pdf-demo:has(.pdf-f${n}:focus) .pdf-p${n},
+.pdf-demo:has(.pdf-b${n}:hover) .pdf-p${n}{opacity:1}
+.pdf-demo:has(.pdf-b${n}:hover) .pdf-f${n}{background-color:var(--color-mark);border-color:var(--color-accent-on-paper)}`,
+  )
+  .join("");
+---
+
+<style is:inline set:html={linkCss}></style>
+
+<figure class="pdf-demo-figure not-prose">
+  <div class="pdf-demo-head">
+    <span class="pdf-demo-try">Try it</span>
+    <span>Hover a field, or a region on the page</span>
+  </div>
+
+  <div class="pdf-demo">
+    <div class="pdf-page" aria-hidden="true">
+      <span class="pdf-title" style={`${at(36, 34)}font-size:${u(20)};`}>INVOICE</span>
+      <span class="pdf-text" style={`${at(270, 37)}font-size:${u(12)};`}>No. INV-2041</span>
+      <span class="pdf-text pdf-strong" style={`${at(40, 92)}font-size:${u(12)};`}>Nordwind Supply</span>
+      <span class="pdf-text pdf-dim" style={`${at(40, 112)}font-size:${u(10)};`}>Hafenstrasse 12, Hamburg</span>
+      <span class="pdf-text" style={`${at(270, 91)}font-size:${u(12)};`}>02 Sep 2026</span>
+      <span class="pdf-rule pdf-rule-dark" style={rect(36, 158, 348, 1)}></span>
+      {
+        tableRows.map(([a, b], i) => (
+          <>
+            <span class="pdf-bar" style={rect(36, 188 + i * 34, a, 8)} />
+            <span class="pdf-bar" style={rect(384 - b, 188 + i * 34, b, 8)} />
+          </>
+        ))
+      }
+      <span class="pdf-rule" style={rect(36, 376, 348, 1)}></span>
+      <span class="pdf-text" style={`${at(40, 404)}font-size:${u(10)};letter-spacing:.08em;`}>TOTAL</span>
+      <span class="pdf-text pdf-strong" style={`${at(252, 400)}font-size:${u(14)};`}>EUR 1,284.00</span>
+      <span class="pdf-text" style={`${at(40, 460)}font-size:${u(10)};`}>IBAN DE00 0000 0000 0000 0000 00</span>
+      <span class="pdf-bar pdf-bar-light" style={rect(40, 500, 220, 5)}></span>
+
+      {
+        fields.map((f) => (
+          <span class={`pdf-box pdf-b${f.n} pdf-slot`} style={`${rect(f.l, f.t, f.w, f.h)}--slot:${f.n - 1};`} />
+        ))
+      }
+    </div>
+
+    <div class="pdf-fields">
+      <div class="pdf-fields-head"><span>Extracted fields</span><span>page 1</span></div>
+      {
+        fields.map((f) => (
+          <button type="button" class={`pdf-field pdf-f${f.n} pdf-slot`} style={`--slot:${f.n - 1};`}>
+            <span class="pdf-field-name">{f.name}</span>
+            <span>{f.value}</span>
+          </button>
+        ))
+      }
+
+      <div class="pdf-readout">
+        <span class="pdf-readout-label">boundingRegions[0].polygon · inches</span>
+        <div class="pdf-readout-values">
+          {
+            fields.map((f) => (
+              <span class={`pdf-poly pdf-p${f.n} pdf-slot`} style={`--slot:${f.n - 1};`}>
+                {f.polygon[0]}
+                <br />
+                {f.polygon[1]}
+              </span>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</figure>
+
+<style>
+  .pdf-demo-figure {
+    margin: 40px 0;
+    /* break out of the 720px prose column */
+    width: min(920px, calc(100vw - 2 * var(--container-padding)));
+    max-width: none;
+  }
+
+  .pdf-demo-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+
+  .pdf-demo-try {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .pdf-demo {
+    display: grid;
+    grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+    gap: 40px;
+    padding: 40px;
+    background: var(--color-surface);
+        border-radius: var(--radius-md);
+  }
+
+  .pdf-page {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 420 / 560;
+    container-type: inline-size;
+    background: var(--color-paper);
+    color: var(--color-paper-ink);
+    border-radius: 2px;
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.05);
+    font-family: var(--font-mono);
+  }
+
+  .pdf-page > span {
+    position: absolute;
+  }
+
+  .pdf-title {
+    font-family: var(--font-primary);
+    font-weight: 800;
+    font-stretch: 120%;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  .pdf-text {
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .pdf-strong {
+    font-weight: 600;
+  }
+
+  .pdf-dim {
+    color: #6e6e73;
+  }
+
+  .pdf-bar {
+    background: #c7c7cc;
+  }
+
+  .pdf-bar-light {
+    background: #e3e3e8;
+  }
+
+  .pdf-rule {
+    background: #d2d2d7;
+  }
+
+  .pdf-rule-dark {
+    background: var(--color-paper-ink);
+  }
+
+  /* auto-cycle: five 2s slots on a 10s loop */
+  @keyframes pdfCycle {
+    0% { opacity: 0; }
+    2%, 18% { opacity: 1; }
+    20%, 100% { opacity: 0; }
+  }
+
+  @keyframes pdfCycleField {
+    0% { background-color: var(--color-bg); border-color: var(--color-border-strong); }
+    2%, 18% { background-color: var(--color-mark); border-color: var(--color-accent-on-paper); }
+    20%, 100% { background-color: var(--color-bg); border-color: var(--color-border-strong); }
+  }
+
+  .pdf-slot {
+    animation-duration: 10s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-fill-mode: backwards;
+    animation-delay: calc(var(--slot) * 2s);
+  }
+
+  .pdf-box,
+  .pdf-poly {
+    opacity: 0;
+    animation-name: pdfCycle;
+    transition: opacity 200ms ease;
+  }
+
+  .pdf-box {
+    border: 2px solid var(--color-accent-on-paper);
+    background: rgba(215, 242, 90, 0.4);
+    mix-blend-mode: multiply;
+  }
+
+  .pdf-box:hover {
+    opacity: 1;
+  }
+
+  .pdf-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-family: var(--font-mono);
+  }
+
+  .pdf-fields-head {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 6px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .pdf-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    min-height: 52px;
+    padding: 0 16px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+    font: inherit;
+    font-size: 13px;
+    color: var(--color-text);
+    text-align: left;
+    cursor: pointer;
+    animation-name: pdfCycleField;
+    transition: background-color 200ms ease, border-color 200ms ease;
+  }
+
+  .pdf-field-name {
+    color: var(--color-text-muted);
+  }
+
+  .pdf-field:hover,
+  .pdf-field:focus {
+    background-color: var(--color-mark);
+    border-color: var(--color-accent-on-paper);
+  }
+
+  /* the reader takes over: stop cycling as soon as they interact */
+  .pdf-demo:hover .pdf-slot,
+  .pdf-demo:focus-within .pdf-slot {
+    animation: none;
+  }
+
+  .pdf-readout {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 16px;
+    background: var(--color-bg);
+    border-radius: var(--radius-sm);
+  }
+
+  .pdf-readout-label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .pdf-readout-values {
+    position: relative;
+    height: 40px;
+  }
+
+  .pdf-poly {
+    position: absolute;
+    inset: 0;
+    font-size: 12.5px;
+    line-height: 20px;
+    color: var(--color-accent-on-paper);
+    white-space: pre;
+  }
+
+  @media (max-width: 760px) {
+    .pdf-demo {
+      grid-template-columns: 1fr;
+      gap: 28px;
+      padding: 20px;
+    }
+
+    .pdf-page {
+      max-width: 420px;
+      margin: 0 auto;
+    }
+  }
+
+  /* without motion, rest on the total so the idea still reads */
+  @media (prefers-reduced-motion: reduce) {
+    .pdf-b5,
+    .pdf-p5 {
+      opacity: 1;
+    }
+  }
+</style>

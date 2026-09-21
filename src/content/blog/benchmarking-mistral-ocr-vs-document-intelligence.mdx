@@ -1,0 +1,56 @@
+---
+title: "I benchmarked Mistral OCR against Document Intelligence. Here's how."
+description: "The test set, what I measured, and why the result changed which engine runs first in my pipeline."
+publishDate: 2026-09-18
+category: "Benchmark · Document AI"
+tags: ["ocr", "mistral", "document intelligence", "benchmark", "azure"]
+featured: true
+visual: "bars"
+draft: true
+---
+
+{/* DRAFT — Bogdan: this post is hidden in production until `draft: false`.
+    The method below is written; every [PLACEHOLDER] needs your real data.
+    Don't publish numbers you haven't measured. */}
+
+Swapping the OCR engine under a production pipeline is not something to do on a hunch. Before moving from Azure Document Intelligence to Mistral OCR, I ran both against the same documents and measured the things my pipeline actually depends on.
+
+## Why benchmark at all
+
+Vendor benchmarks are run on clean, public datasets. My documents are scanned contracts and supplier invoices: stamped, skewed, photographed on a counter. The only benchmark that predicts how an engine behaves on my data is one run on my data.
+
+## The test set
+
+- **[N] documents**, sampled from real traffic rather than hand-picked.
+- A deliberate mix: [X] clean digital PDFs, [Y] flatbed scans, [Z] phone photos.
+- [LANGUAGES] represented in proportion to production.
+- Ground truth labelled by hand for the fields the pipeline needs: [FIELD LIST].
+
+Sampling matters more than size. A small set that looks like production beats a large one that doesn't.
+
+## What I measured
+
+1. **Field-level accuracy.** Did the pipeline end up with the right value for each field? This is the number the business feels. Normalise before comparing (dates, decimal separators, whitespace), otherwise formatting noise is counted as errors.
+2. **Character error rate** on the raw text, to separate "OCR misread it" from "extraction picked the wrong thing".
+3. **Latency** per page, at the median and at p95. The tail is what queues feel.
+4. **Cost per page** at production volume.
+5. **Layout output.** Does the engine return coordinates good enough to [highlight the source on the PDF](/blog/highlighting-pdfs-with-bounding-boxes)?
+
+## Results
+
+| Metric | Mistral OCR | Document Intelligence |
+| --- | --- | --- |
+| Field accuracy | [RESULT] | [RESULT] |
+| Character error rate | [RESULT] | [RESULT] |
+| Latency p50 / p95 | [RESULT] | [RESULT] |
+| Cost per 1,000 pages | [RESULT] | [RESULT] |
+
+[WHAT STOOD OUT: where each engine won, and the document types where it broke.]
+
+## What changed in the pipeline
+
+[THE DECISION: which engine runs first now, what the other one is still used for, and what it took to switch.]
+
+## What I'd do differently
+
+[LESSONS: anything about the test set, labelling effort or metrics you'd change next time.]

@@ -1,0 +1,43 @@
+---
+title: "AI invoice-processing platform"
+description: "Mailbox ingestion, LLM extraction with a Document Intelligence fallback, approval workflow, automatic booking in Dynamics 365."
+technologies: ["LLM extraction", "Azure Document Intelligence", "Dynamics 365", "Next.js", "Azure Container Apps", "Key Vault", "Azure DevOps"]
+outcome: "Built end-to-end as the solo owner: from the mailbox an invoice lands in to the entry booked in Dynamics 365."
+featured: true
+homeOrder: 1
+completedDate: 2026-09-01
+---
+
+import Pipeline from "../../components/home/Pipeline.astro";
+
+An anonymized case study. The client and their numbers are confidential; the architecture and the engineering decisions are mine to talk about.
+
+## Context
+
+Vendor invoices arrive by email as PDFs and scans, in every layout a supplier can invent. Someone then reads each one, types the values into the ERP and chases an approval. The goal was to take the retyping out completely and keep a human only where a human adds something: the approval.
+
+## What I built
+
+<div style="margin: 32px calc((100% - min(1040px, 100vw - 48px)) / 2); padding: 40px 24px 36px; border-radius: 28px; background: var(--color-surface);">
+  <Pipeline />
+</div>
+
+The platform is a pipeline with five stages:
+
+1. **Mailbox ingestion.** Incoming invoices are picked up from a shared mailbox without anyone forwarding or uploading them.
+2. **LLM extraction.** A language model reads the document and returns structured fields: vendor, invoice number, dates, line items, totals.
+3. **Document Intelligence fallback.** When the model is unsure, or the scan is poor, the document takes a second route through Azure Document Intelligence before it goes any further.
+4. **Approval workflow.** The approver sees the extracted values next to the source PDF, with the regions each value came from highlighted on the page.
+5. **Booking in Dynamics 365.** Once approved, the invoice is posted automatically.
+
+## Engineering notes
+
+- **Every stage is idempotent.** A retry never books the same invoice twice.
+- **Errors are classified.** Transient failures retry with backoff; permanent ones are routed to a person with the context they need.
+- **Every document carries a correlation ID** through structured logs, so any invoice can be traced from the inbox to the ledger.
+- **The infrastructure is part of the product.** Container Apps, Key Vault, Blob Storage and Azure DevOps pipelines, all owned and operated by me.
+
+## Related writing
+
+- [Show your evidence: highlighting PDFs with bounding boxes](/blog/highlighting-pdfs-with-bounding-boxes)
+- [Letting the model decide](/blog/ai-as-the-decision-maker)

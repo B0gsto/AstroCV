@@ -1,0 +1,136 @@
+---
+// Small animated teaser for a featured post card.
+interface Props {
+  kind: "boxes" | "bars";
+}
+
+const { kind } = Astro.props;
+
+const boxes = [
+  { l: 58, t: 8, w: 34, h: 9 },
+  { l: 8, t: 22, w: 46, h: 14 },
+  { l: 58, t: 22, w: 34, h: 9 },
+  { l: 54, t: 70, w: 38, h: 11 },
+];
+---
+
+{
+  kind === "bars" ? (
+    <div class="pv pv-bars" aria-hidden="true">
+      <div class="pv-bar-row">
+        <div class="pv-bar-label"><span>Mistral OCR</span><span>[RESULT]</span></div>
+        <div class="pv-track"><div class="pv-fill bar-grow" style="width:88%;" /></div>
+      </div>
+      <div class="pv-bar-row">
+        <div class="pv-bar-label"><span>Azure Document Intelligence</span><span>[RESULT]</span></div>
+        <div class="pv-track"><div class="pv-fill pv-fill-paper bar-grow" style="width:64%;animation-delay:.25s;" /></div>
+      </div>
+    </div>
+  ) : (
+    <div class="pv pv-boxes" aria-hidden="true">
+      <div class="pv-page">
+        <span class="pv-line" style="left:8%;top:9%;width:30%;height:5%;background:#1d1d1f;" />
+        <span class="pv-line" style="left:61%;top:10.5%;width:28%;height:3.5%;" />
+        <span class="pv-line" style="left:11%;top:25%;width:34%;height:3.5%;" />
+        <span class="pv-line" style="left:11%;top:31%;width:24%;height:2.5%;" />
+        <span class="pv-line" style="left:61%;top:24.5%;width:28%;height:3.5%;" />
+        <span class="pv-line" style="left:8%;top:46%;width:84%;height:1%;" />
+        <span class="pv-line" style="left:8%;top:53%;width:50%;height:2.5%;" />
+        <span class="pv-line" style="left:8%;top:60%;width:40%;height:2.5%;" />
+        <span class="pv-line" style="left:58%;top:73.5%;width:30%;height:4%;background:#1d1d1f;" />
+        {boxes.map((b, i) => (
+          <span class="pv-box" style={`left:${b.l}%;top:${b.t}%;width:${b.w}%;height:${b.h}%;animation-delay:${i * 2}s;`} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+<style>
+  .pv {
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.045);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+
+  .pv-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .pv-bar-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pv-bar-label {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--color-text-secondary);
+  }
+
+  .pv-track {
+    height: 14px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.07);
+  }
+
+  .pv-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--color-text);
+  }
+
+  .pv-fill-paper {
+    background: #a1a1a6;
+  }
+
+  .pv-boxes {
+    display: flex;
+    justify-content: center;
+  }
+
+  .pv-page {
+    position: relative;
+    width: min(100%, 260px);
+    aspect-ratio: 4 / 3;
+    background: var(--color-paper);
+    border-radius: 6px;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+
+  .pv-page > span {
+    position: absolute;
+  }
+
+  .pv-line {
+    background: #c7c7cc;
+  }
+
+  @keyframes pvCycle {
+    0% { opacity: 0; }
+    3%, 22% { opacity: 1; }
+    25%, 100% { opacity: 0; }
+  }
+
+  .pv-box {
+    border: 1.5px solid var(--color-accent-on-paper);
+    background: rgba(215, 242, 90, 0.4);
+    mix-blend-mode: multiply;
+    opacity: 0;
+    animation: pvCycle 8s linear infinite backwards;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pv-box:last-child {
+      opacity: 1;
+    }
+  }
+</style>

@@ -1,0 +1,46 @@
+---
+title: "Container Apps in production: the practices I actually keep"
+description: "Revisions, secrets through Key Vault, scaling rules and the pipeline that ships them."
+publishDate: 2026-09-16
+category: "Azure"
+tags: ["azure", "container apps", "devops", "key vault", "ci/cd"]
+draft: false
+---
+
+Azure Container Apps sits in a useful middle: more control than App Service, far less to operate than Kubernetes. As a solo owner of production systems, that trade is exactly what I want. These are the practices that survived contact with real workloads.
+
+## One environment per stage, not per app
+
+A Container Apps environment is the boundary for networking and logging. I keep one per stage (dev, test, production) and put the apps that belong together inside it. They share a virtual network and a Log Analytics workspace, and they can call each other over internal ingress without ever being exposed publicly.
+
+Only the apps that need the outside world get external ingress. Everything else is internal by default.
+
+## Secrets live in Key Vault, identity does the fetching
+
+No secret values in pipeline variables, no connection strings in app settings. Each app has a managed identity, the identity has read access to the vault, and the app's secrets are Key Vault references. Rotating a secret becomes a vault operation rather than a redeploy of everything that uses it.
+
+The same identity pulls the image from the container registry, so there is no registry password to leak either.
+
+## Revisions are the rollback plan
+
+Every deploy creates a new revision. I tag images with the build ID rather than `latest`, so a revision always points at exactly one build and "what is running?" has a precise answer.
+
+For risky changes I switch the app to multiple-revision mode and split traffic: a small share to the new revision first, all of it once the logs stay quiet. Rolling back is moving traffic, which takes seconds and doesn't need a pipeline run.
+
+## Scale on the real signal
+
+HTTP concurrency is the default scale rule, and it is the wrong one for background work. A worker that drains a queue should scale on queue length. Container Apps exposes KEDA scalers for that, so the rule can watch the queue directly.
+
+Scale-to-zero is great for cost and bad for latency. My rule of thumb: anything a person waits on keeps a minimum of one replica; anything that processes a backlog can go to zero.
+
+## Probes, or the platform guesses
+
+Without health probes the platform only knows whether the process is alive. I define a startup probe for slow boots, a readiness probe that checks the dependencies the app can't work without, and a liveness probe that stays cheap. It is the difference between a bad deploy failing on its own and a bad deploy receiving traffic.
+
+## Jobs for things that finish
+
+Scheduled and one-off work goes into Container Apps jobs instead of an always-on app with a timer inside. A job starts, does its work, exits, and its exit code tells me whether it worked.
+
+## The pipeline is the documentation
+
+Everything above is described as infrastructure as code and shipped through Azure DevOps: build, scan, push, deploy to dev, promote. If the pipeline can't recreate the environment from scratch, I don't consider the environment understood.

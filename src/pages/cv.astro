@@ -8,9 +8,10 @@ const experience = [
     period: "Mar 2026 — Present",
     location: "Cluj-Napoca · Hybrid",
     points: [
-      "Architect, develop and manage Azure infrastructure using Container Apps, Key Vault and Azure DevOps pipelines.",
-      "Develop cross-platform mobile applications using React Native and Expo.",
-      "Build AI-powered workflow solutions using Microsoft Foundry and Model Context Protocol integrations.",
+      "Built an AI invoice-processing platform end-to-end: mailbox ingestion, LLM extraction with an Azure Document Intelligence fallback, approval workflow and automatic booking in Dynamics 365.",
+      "Own a production Next.js contract-management platform for a retailer, including PDF/QR/OCR extraction pipelines for scanned contracts.",
+      "Ship a cross-platform mobile app (React Native/Expo, .NET backend, Entra ID auth) end-to-end, including Android and iOS store releases.",
+      "Architect and manage Azure infrastructure: Container Apps, Key Vault, Blob Storage and Azure DevOps CI/CD pipelines.",
     ],
   },
   {
@@ -132,8 +133,7 @@ const skillGroups = [
   </article>
 
   <script is:inline>
-    const button = document.getElementById("print-cv");
-    if (button) button.addEventListener("click", () => window.print());
+    document.getElementById("print-cv")?.addEventListener("click", () => window.print());
   </script>
 </BaseLayout>
 
@@ -192,6 +192,8 @@ const skillGroups = [
 
   .cv-section > h2 {
     margin-bottom: 18px;
+    font-size: clamp(1.5rem, 2.6vw, 2rem);
+    font-stretch: 108%;
   }
 
   .cv-timeline {

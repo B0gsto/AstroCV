@@ -19,6 +19,10 @@ const blogCollection = defineCollection({
     updatedDate: z.date().optional(),
     tags: z.array(z.string()),
     coverImage: z.string().optional(),
+    category: z.string().optional(),
+    featured: z.boolean().default(false),
+    // teaser drawn on the featured card: "boxes" = PDF highlight, "bars" = benchmark
+    visual: z.enum(["boxes", "bars"]).optional(),
     draft: z.boolean().default(false),
   }),
 });
@@ -34,6 +38,8 @@ const projectsCollection = defineCollection({
     coverImage: z.string().optional(),
     outcome: z.string().optional(),
     featured: z.boolean().default(false),
+    // position in the homepage "Selected work" rows; omit to keep it off the homepage
+    homeOrder: z.number().optional(),
     completedDate: z.date(),
   }),
 });

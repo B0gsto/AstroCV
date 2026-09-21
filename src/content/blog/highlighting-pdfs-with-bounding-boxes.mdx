@@ -1,0 +1,61 @@
+---
+title: "Show your evidence: highlighting PDFs with Document Intelligence bounding boxes"
+description: "Turning polygons into overlays, so an approver sees exactly where on the page a value came from."
+publishDate: 2026-09-17
+category: "Document AI"
+tags: ["document intelligence", "azure", "pdf", "ocr", "ux"]
+featured: true
+visual: "boxes"
+draft: false
+---
+
+import PdfHighlightDemo from "../../components/blog/PdfHighlightDemo.astro";
+
+An approver shouldn't have to trust an extracted number. They should be able to see where on the page it came from.
+
+## The problem
+
+When a pipeline pulls a total off a scanned invoice, the value alone isn't enough for the person who signs it off. If they have to open the PDF and hunt for the number, the automation saved nobody any time. It moved the reading from one person to another.
+
+Azure Document Intelligence returns more than text. Every field, line and word comes with `boundingRegions`: a page number and a polygon. That is enough to draw the evidence directly on the document.
+
+## Try it
+
+<PdfHighlightDemo />
+
+The values on the right are what the pipeline extracted. The boxes on the left are where it found them. Once the two are linked, "is this total right?" becomes a glance instead of a search.
+
+## Polygons to boxes
+
+For a PDF, the polygon is eight numbers in inches: four corners, clockwise from the top left. The page reports its own `width`, `height` and `unit` in the same response. Divide one by the other and you get percentages, which means the overlay keeps lining up at any zoom level and on any screen.
+
+```ts
+type Page = { width: number; height: number };
+
+// polygon: [x1, y1, x2, y2, x3, y3, x4, y4] in page units
+const toBox = (polygon: number[], page: Page) => {
+  const xs = polygon.filter((_, i) => i % 2 === 0);
+  const ys = polygon.filter((_, i) => i % 2 === 1);
+  const pct = (v: number, of: number) => `${(v / of) * 100}%`;
+
+  return {
+    left: pct(Math.min(...xs), page.width),
+    top: pct(Math.min(...ys), page.height),
+    width: pct(Math.max(...xs) - Math.min(...xs), page.width),
+    height: pct(Math.max(...ys) - Math.min(...ys), page.height),
+  };
+};
+```
+
+Render the PDF page as an image or a canvas, put a `position: relative` wrapper around it, and each highlight is an absolutely positioned element with those four values. No canvas maths, no re-rendering when the viewer zooms.
+
+## Things that bite
+
+- **Units change with the input.** PDFs come back in inches, images in pixels. Always read `unit` from the page instead of assuming.
+- **Scans are rotated.** The page has an `angle`. A polygon is four real corners, not an axis-aligned rectangle, so on a skewed scan the min/max box above is slightly generous. For highlighting that's fine. For cropping, use the polygon itself.
+- **Fields span regions.** A value can wrap across lines or pages, which is why `boundingRegions` is an array. Draw all of them.
+- **Keep the raw response.** I store the analysis result next to the document. The overlay can then be rebuilt at any time without paying for the analysis again, and it doubles as an audit trail for what the system saw.
+
+## Why it's worth the effort
+
+The highlight is a small feature that changes how people feel about the whole pipeline. An extracted value with no source is a claim. The same value with a box around it on the original document is evidence, and evidence is what gets an approval workflow adopted.

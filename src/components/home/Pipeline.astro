@@ -1,0 +1,251 @@
+---
+// Animated pipeline: packets travel the main line; a paler one takes the
+// Document Intelligence fallback branch. Drawn on a 1200x190 grid so the
+// SVG and the five-column captions below stay aligned at any width.
+
+const stages = [
+  { id: "01", title: "Mailbox ingestion", text: "Invoices arrive by email and are picked up on their own." },
+  { id: "02", title: "LLM extraction", text: "Fields come out as structured data, not text soup." },
+  { id: "03", title: "Validation", text: "Business rules check the result before anyone trusts it." },
+  { id: "04", title: "Approval workflow", text: "The right person signs off, with the source PDF highlighted." },
+  { id: "05", title: "Booked in Dynamics 365", text: "Posted automatically. No copy-paste step left." },
+];
+
+const nodeX = [120, 360, 600, 840, 1080];
+const LINE_Y = 150;
+// a packet crosses node i at i * 1.5s of its 6s trip; three packets leave 2s apart
+const pulseDelay = [0, 1.5, 1, 0.5, 0];
+---
+
+<div class="pipe">
+  <div class="pipe-visual" aria-hidden="true">
+    <svg viewBox="0 0 1200 190" fill="none">
+      <path id="pipe-main" class="pipe-line" d={`M120 ${LINE_Y} L1080 ${LINE_Y}`}></path>
+      <path
+        id="pipe-branch"
+        class="pipe-branch"
+        d={`M120 ${LINE_Y} L360 ${LINE_Y} Q360 40 480 40 Q600 40 600 ${LINE_Y} L1080 ${LINE_Y}`}
+        visibility="hidden"
+      ></path>
+      <path class="pipe-branch-line" d={`M360 ${LINE_Y} Q360 40 480 40 Q600 40 600 ${LINE_Y}`}></path>
+
+      {
+        nodeX.map((x, i) => (
+          <g>
+            <circle class="pipe-ring" cx={x} cy={LINE_Y} r="8" style={`animation-delay:${pulseDelay[i]}s;`} />
+            <circle class:list={["pipe-node", { "pipe-node-final": i === nodeX.length - 1 }]} cx={x} cy={LINE_Y} r="7" />
+          </g>
+        ))
+      }
+
+      <g class="pipe-packets">
+        {
+          [0, -2, -4].map((begin) => (
+            <rect class="pipe-packet" x="-5" y="-5" width="10" height="10" rx="1">
+              <animateMotion dur="6s" begin={`${begin}s`} repeatCount="indefinite">
+                <mpath href="#pipe-main" />
+              </animateMotion>
+            </rect>
+          ))
+        }
+        <rect class="pipe-packet pipe-packet-fallback" x="-5" y="-5" width="10" height="10" rx="1">
+          <animateMotion dur="9s" begin="-1s" repeatCount="indefinite">
+            <mpath href="#pipe-branch" />
+          </animateMotion>
+        </rect>
+      </g>
+    </svg>
+    <span class="pipe-fallback-pill">Document Intelligence fallback</span>
+  </div>
+
+  <ol class="pipe-list">
+    {
+      stages.map((stage, i) => (
+        <>
+          <li class="pipe-stage" data-reveal style={`--reveal-delay:${i * 90}ms;`}>
+            <span class="pipe-id">{stage.id}</span>
+            <strong>{stage.title}</strong>
+            <span class="pipe-text">{stage.text}</span>
+          </li>
+          {i === 1 && (
+            <li class="pipe-stage pipe-stage-fallback">
+              <span class="pipe-id">if unsure</span>
+              <strong>Document Intelligence fallback</strong>
+              <span class="pipe-text">Low-confidence documents take a second route before validation.</span>
+            </li>
+          )}
+        </>
+      ))
+    }
+  </ol>
+</div>
+
+<style>
+  .pipe-visual {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1200 / 190;
+  }
+
+  .pipe-visual svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .pipe-line {
+    stroke: var(--color-border-hover);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  @keyframes pipeDash {
+    to { stroke-dashoffset: -16; }
+  }
+
+  .pipe-branch-line {
+    stroke: var(--color-text-muted);
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+    vector-effect: non-scaling-stroke;
+    animation: pipeDash 1.2s linear infinite;
+  }
+
+  .pipe-node {
+    fill: var(--color-surface);
+    stroke: var(--color-accent);
+    stroke-width: 2;
+  }
+
+  .pipe-node-final {
+    fill: var(--color-accent);
+  }
+
+  @keyframes pipeRing {
+    0% { transform: scale(1); opacity: 0.7; }
+    70%, 100% { transform: scale(2.6); opacity: 0; }
+  }
+
+  .pipe-ring {
+    fill: none;
+    stroke: var(--color-accent);
+    stroke-width: 1.5;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: pipeRing 2s ease-out infinite;
+  }
+
+  .pipe-packet {
+    fill: var(--color-accent);
+  }
+
+  .pipe-packet-fallback {
+    fill: #a1a1a6;
+  }
+
+  .pipe-fallback-pill {
+    position: absolute;
+    left: 40%;
+    top: 21%;
+    transform: translate(-50%, -50%);
+    padding: 8px 14px;
+    background: var(--color-surface);
+    border: 1px dashed var(--color-text-muted);
+    border-radius: var(--radius-pill);
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+  }
+
+  .pipe-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    margin-top: 4px;
+  }
+
+  .pipe-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 0 14px;
+    text-align: center;
+  }
+
+  .pipe-stage-fallback {
+    display: none;
+  }
+
+  .pipe-id {
+    font-size: 13px;
+    color: var(--color-text-muted);
+  }
+
+  .pipe-stage strong {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  .pipe-text {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+  }
+
+  /* Narrow screens: the line turns vertical and the fallback becomes its own step */
+  @keyframes pipeDrop {
+    from { top: 0; }
+    to { top: 100%; }
+  }
+
+  @media (max-width: 900px) {
+    .pipe-visual {
+      display: none;
+    }
+
+    .pipe-list {
+      position: relative;
+      grid-template-columns: 1fr;
+      gap: 28px;
+      margin-top: 0;
+      padding-left: 32px;
+      border-left: 1px solid var(--color-border-hover);
+    }
+
+    .pipe-list::before {
+      content: "";
+      position: absolute;
+      left: -5px;
+      top: 0;
+      width: 9px;
+      height: 9px;
+      border-radius: 1px;
+      background: var(--color-accent);
+      animation: pipeDrop 5s linear infinite;
+    }
+
+    .pipe-stage,
+    .pipe-stage-fallback {
+      display: flex;
+      align-items: flex-start;
+      padding: 0;
+      text-align: left;
+    }
+
+    .pipe-stage-fallback strong {
+      color: var(--color-text-secondary);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pipe-packets,
+    .pipe-ring,
+    .pipe-list::before {
+      display: none;
+    }
+  }
+</style>

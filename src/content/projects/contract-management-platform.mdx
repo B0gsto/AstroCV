@@ -1,0 +1,26 @@
+---
+title: "Contract-management platform"
+description: "A production Next.js platform for a retailer, with PDF, QR and OCR extraction pipelines for scanned contracts."
+technologies: ["Next.js", "TypeScript", "OCR", "QR / PDF extraction", "Dynamics 365", "Azure Container Apps"]
+outcome: "In production and owned by me, including the extraction pipelines that read scanned contracts."
+featured: true
+homeOrder: 2
+completedDate: 2026-08-01
+---
+
+An anonymized case study. The client is a retailer; the name stays private.
+
+## Context
+
+Contracts are signed at the point of sale and come back as scans. The platform exists so that finding, checking and archiving a contract does not depend on someone opening PDFs and reading them.
+
+## What I built
+
+- A **production Next.js platform** for finding, reviewing and managing contracts.
+- **Extraction pipelines for scanned contracts**: PDF parsing where the file has a text layer, QR decoding where the document carries a code, and OCR for everything else.
+- The current work extends this to the **Dynamics 365 side**: contracts are matched and archived without anyone retyping them, as part of a digital point-of-sale flow.
+
+## Engineering notes
+
+- Scans are the hard part. The same contract template arrives rotated, cropped, stamped and photographed, so the pipeline combines three signals: the PDF text layer when there is one, a QR code when the document carries one, and OCR for the rest.
+- I own the platform end to end: architecture, implementation, Azure infrastructure and the deployment pipeline.
