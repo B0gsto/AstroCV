@@ -1,11 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-  <defs>
-    <linearGradient id="g" x1="18" y1="12" x2="112" y2="116" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#38BDF8"/>
-      <stop offset="0.55" stop-color="#6366F1"/>
-      <stop offset="1" stop-color="#A855F7"/>
-    </linearGradient>
-  </defs>
-  <rect x="12" y="12" width="104" height="104" rx="32" fill="url(#g)"/>
-  <text x="64" y="76" font-family="Inter, system-ui, sans-serif" font-size="38" font-weight="800" fill="#FFFFFF" text-anchor="middle">BS</text>
+  <rect width="128" height="128" rx="30" fill="#ffffff"/>
+  <rect x="4" y="4" width="120" height="120" rx="27" fill="#f5f5f7"/>
+  <rect x="26" y="66" width="76" height="30" rx="6" fill="#d7f25a"/>
+  <path fill="#1d1d1f" d="M40 28h28c14 0 23 7 23 18 0 8-4 13-11 16 9 2 15 9 15 19 0 13-10 21-26 21H40V28Zm16 13v17h10c6 0 10-3 10-9s-4-8-10-8H56Zm0 30v18h12c7 0 11-3 11-9s-4-9-11-9H56Z"/>
 </svg>

@@ -1,11 +1,16 @@
 /* ============================================
-   ANIMATIONS — Restrained, functional motion
+   MOTION — every animation explains something or
+   confirms an interaction. Content is never gated:
+   reveals only hide things once JS has confirmed it
+   can show them again, and reduced motion turns it all off.
    ============================================ */
+
+/* ---- Load-in ---- */
 
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(15px);
+    transform: translateY(14px);
   }
   to {
     opacity: 1;
@@ -18,46 +23,185 @@
   to { opacity: 1; }
 }
 
-/* Animation classes */
+@keyframes riseLine {
+  from { transform: translateY(105%); }
+  to { transform: translateY(0); }
+}
 
 .animate-fade-in {
-  animation: fadeIn 0.4s ease forwards;
+  animation: fadeIn 0.5s ease backwards;
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.5s ease forwards;
+  animation: fadeInUp 0.8s var(--ease-out) backwards;
 }
 
-/* Stagger — keep only three levels */
+.stagger-1 { animation-delay: 0.12s; }
+.stagger-2 { animation-delay: 0.3s; }
+.stagger-3 { animation-delay: 0.45s; }
 
-.stagger-1 { animation-delay: 0.1s; }
-.stagger-2 { animation-delay: 0.2s; }
-.stagger-3 { animation-delay: 0.3s; }
+/* Headline lines that rise out of a mask */
 
-/* Hover lift — restrained */
-
-.hover-lift {
-  transition: transform var(--transition-base);
+.line-mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.1em;
 }
 
-.hover-lift:hover {
-  transform: translateY(-3px);
+.line-rise {
+  display: block;
+  animation: riseLine 0.9s var(--ease-out) backwards;
 }
 
-/* Page transition */
+.line-mask:nth-child(2) .line-rise { animation-delay: 0.12s; }
+.line-mask:nth-child(3) .line-rise { animation-delay: 0.24s; }
+
+/* Highlighter sweep behind a phrase */
+
+@keyframes markSweep {
+  from {
+    background-size: 0% 100%;
+    color: var(--color-text);
+  }
+  to {
+    background-size: 100% 100%;
+    color: var(--color-mark-ink);
+  }
+}
+
+.mark {
+  padding: 0 0.12em;
+  margin-left: -0.12em;
+  border-radius: 0.12em;
+  color: var(--color-mark-ink);
+  background-image: linear-gradient(var(--color-mark), var(--color-mark));
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: 100% 100%;
+  animation: markSweep 0.9s var(--ease-in-out) 0.7s backwards;
+}
+
+/* ---- Live dot ---- */
+
+@keyframes livePulse {
+  0% { box-shadow: 0 0 0 0 rgba(47, 179, 68, 0.45); }
+  70%, 100% { box-shadow: 0 0 0 10px rgba(47, 179, 68, 0); }
+}
+
+.live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--color-live);
+  animation: livePulse 2s ease-out infinite;
+}
+
+/* ---- Scroll reveals (armed by the inline script in BaseLayout) ---- */
+
+html.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(26px) scale(0.97);
+  filter: blur(10px);
+  transition: opacity 0.9s var(--ease-out), transform 1.1s var(--ease-out), filter 0.9s var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+html.js [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* ---- Headings: words rise and sharpen one after another ---- */
+
+.split-word {
+  display: inline-block;
+}
+
+html.js [data-split] .split-word {
+  opacity: 0;
+  transform: translateY(0.45em);
+  filter: blur(8px);
+  transition: opacity 0.8s var(--ease-out), transform 0.9s var(--ease-out), filter 0.8s var(--ease-out);
+  transition-delay: calc(var(--w) * 55ms);
+}
+
+html.js [data-split].is-in .split-word {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* ---- Tiles that lean towards the cursor carry a soft light with them ---- */
+
+[data-tilt] {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+[data-tilt]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.9), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.section-tinted [data-tilt]::after {
+  background: radial-gradient(420px circle at var(--mx, 50%) var(--my, 50%), rgba(0, 0, 0, 0.045), transparent 60%);
+}
+
+[data-tilt]:hover::after {
+  opacity: 1;
+}
+
+[data-tilt] > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---- Bars that grow (benchmark teaser) ---- */
+
+@keyframes barGrow {
+  0% { transform: scaleX(0); }
+  35%, 85% { transform: scaleX(1); }
+  100% { transform: scaleX(0); }
+}
+
+.bar-grow {
+  transform-origin: left center;
+  animation: barGrow 6s cubic-bezier(0.3, 0.8, 0.2, 1) infinite;
+}
+
+/* ---- Page transition ---- */
 
 .page-transition {
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.35s ease;
 }
 
-/* Reduced motion */
+/* ---- Reduced motion ---- */
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
+    animation: none !important;
     transition-duration: 0.01ms !important;
+  }
+
+  html.js [data-reveal],
+  html.js [data-split] .split-word {
+    opacity: 1;
+    transform: none;
+    filter: none;
   }
 }

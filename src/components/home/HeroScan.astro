@@ -1,0 +1,344 @@
+---
+// Animated hero: an invoice is scanned, fields are boxed, the values land in
+// structured output, then the decision steps tick through to "booked".
+// The stage is drawn on a 640x540 grid and scales with its container (cqw).
+
+const STAGE_W = 640;
+const u = (px: number) => `${+((px / STAGE_W) * 100).toFixed(3)}cqw`;
+const rect = (l: number, t: number, w: number, h: number) =>
+  `left:${u(l)};top:${u(t)};width:${u(w)};height:${u(h)};`;
+
+// start = % of the 10s loop at which the element appears
+const boxes = [
+  { label: "INVOICE_NO", l: 208, t: 22, w: 108, h: 26, start: 4 },
+  { label: "DATE", l: 208, t: 65, w: 108, h: 26, start: 7 },
+  { label: "VENDOR", l: 22, t: 65, w: 150, h: 42, start: 9 },
+  { label: "LINE_ITEMS", l: 22, t: 148, w: 296, h: 176, start: 20, soft: true },
+  { label: "TOTAL", l: 190, t: 352, w: 128, h: 30, start: 29 },
+];
+
+const connectors = [
+  { d: "M340 75 C376 75 374 135 410 135", start: 7 },
+  { d: "M340 118 C376 118 374 175 410 175", start: 9 },
+  { d: "M340 128 C380 128 370 215 410 215", start: 12 },
+  { d: "M340 275 C376 275 374 255 410 255", start: 24 },
+  { d: "M340 407 C380 407 370 295 410 295", start: 33 },
+];
+
+const fields = [
+  { key: "invoice_no", value: '"INV-2041"', start: 9 },
+  { key: "date", value: '"2026-09-02"', start: 12 },
+  { key: "vendor", value: '"Nordwind Supply"', start: 15 },
+  { key: "line_items", value: "[ 4 rows ]", start: 24 },
+  { key: "total", value: "1284.00 EUR", start: 33, accent: true },
+];
+
+const steps = [
+  { label: "validated against rules", start: 42 },
+  { label: "approved", start: 50 },
+  { label: "booked in Dynamics 365", start: 58, final: true },
+];
+
+const tableRows = [
+  [150, 44],
+  [118, 38],
+  [164, 48],
+  [96, 40],
+];
+
+const starts = [...new Set([...boxes, ...connectors, ...fields, ...steps].map((i) => i.start))];
+const hidden = "inset(-2em 100% -0.6em -0.6em)";
+const shown = "inset(-2em -0.6em -0.6em -0.6em)";
+const keyframes = starts
+  .map(
+    (s) => `
+@keyframes hs-r${s}{0%,${s}%{opacity:0;clip-path:${hidden}}${s + 4}%,90%{opacity:1;clip-path:${shown}}94%,100%{opacity:0;clip-path:${shown}}}
+@keyframes hs-d${s}{0%,${s}%{stroke-dashoffset:1;opacity:1}${s + 4}%,90%{stroke-dashoffset:0;opacity:1}94%,100%{stroke-dashoffset:0;opacity:0}}`,
+  )
+  .join("");
+---
+
+<style is:inline set:html={keyframes}></style>
+
+<div
+  class="hs-stage"
+  role="img"
+  aria-label="Animation: an invoice is scanned, its fields are boxed and extracted into structured data, then validated, approved and booked in Dynamics 365."
+>
+  <div class="hs-sheet" style={rect(10, 46, 340, 460)}></div>
+
+  <div class="hs-doc" style={rect(0, 40, 340, 460)}>
+    <span class="hs-doc-title" style={`left:${u(28)};top:${u(28)};font-size:${u(17)};`}>INVOICE</span>
+    <span class="hs-doc-text" style={`left:${u(216)};top:${u(29)};font-size:${u(11)};`}>No. INV-2041</span>
+    <span class="hs-doc-text hs-strong" style={`left:${u(30)};top:${u(72)};font-size:${u(11)};`}>Nordwind Supply</span>
+    <span class="hs-bar" style={rect(30, 92, 110, 6)}></span>
+    <span class="hs-doc-text" style={`left:${u(216)};top:${u(72)};font-size:${u(11)};`}>02 Sep 2026</span>
+    <span class="hs-rule hs-rule-dark" style={rect(30, 128, 280, 1)}></span>
+    {
+      tableRows.map(([a, b], i) => (
+        <>
+          <span class="hs-bar hs-bar-dark" style={rect(30, 160 + i * 29, a, 7)} />
+          <span class="hs-bar hs-bar-dark" style={rect(310 - b, 160 + i * 29, b, 7)} />
+        </>
+      ))
+    }
+    <span class="hs-rule" style={rect(30, 336, 280, 1)}></span>
+    <span class="hs-doc-text" style={`left:${u(30)};top:${u(362)};font-size:${u(10)};letter-spacing:.08em;`}>TOTAL</span>
+    <span class="hs-doc-text hs-strong" style={`left:${u(198)};top:${u(359)};font-size:${u(12)};`}>EUR 1,284.00</span>
+    <span class="hs-bar hs-bar-light" style={rect(30, 412, 200, 5)}></span>
+    <span class="hs-bar hs-bar-light" style={rect(30, 424, 150, 5)}></span>
+
+    {
+      boxes.map((b) => (
+        <span
+          class:list={["hs-box", "hs-loop", { "hs-box-soft": b.soft }]}
+          style={`${rect(b.l, b.t, b.w, b.h)}animation-name:hs-r${b.start};`}
+        >
+          <span class="hs-box-label" style={`font-size:${u(8)};top:${u(-15)};`}>{b.label}</span>
+        </span>
+      ))
+    }
+
+    <span class="hs-scan"></span>
+  </div>
+
+  <svg class="hs-wires" viewBox="0 0 640 540" fill="none" aria-hidden="true">
+    {
+      connectors.map((c) => (
+        <path class="hs-loop" d={c.d} pathLength="1" style={`animation-name:hs-d${c.start};`} />
+      ))
+    }
+  </svg>
+
+  <div class="hs-panel" style={`left:${u(410)};top:${u(70)};width:${u(230)};padding:${u(16)} ${u(18)};`}>
+    <div class="hs-panel-head" style={`font-size:${u(10)};padding-bottom:${u(12)};`}>
+      <span>extracted</span><span>json</span>
+    </div>
+    {
+      fields.map((f) => (
+        <div class="hs-field hs-loop" style={`height:${u(40)};animation-name:hs-r${f.start};`}>
+          <span class="hs-key" style={`font-size:${u(9.5)};`}>{f.key}</span>
+          <span class:list={["hs-value", { "hs-accent": f.accent }]} style={`font-size:${u(12.5)};`}>{f.value}</span>
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="hs-steps" style={`left:${u(410)};top:${u(350)};width:${u(230)};gap:${u(8)};font-size:${u(12)};`}>
+    {
+      steps.map((s) => (
+        <div
+          class:list={["hs-step", "hs-loop", { "hs-step-final": s.final }]}
+          style={`height:${u(34)};padding:0 ${u(12)};gap:${u(10)};animation-name:hs-r${s.start};`}
+        >
+          <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style={`width:${u(14)};height:${u(14)};`}>
+            <path d="M2.5 7.5l3 3 6-7" />
+          </svg>
+          {s.label}
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .hs-stage {
+    position: relative;
+    width: 100%;
+    max-width: 640px;
+    aspect-ratio: 640 / 540;
+    container-type: inline-size;
+    font-family: var(--font-mono);
+  }
+
+  .hs-stage :global(*) {
+    box-sizing: border-box;
+  }
+
+  .hs-sheet,
+  .hs-doc,
+  .hs-panel,
+  .hs-steps,
+  .hs-doc > span {
+    position: absolute;
+  }
+
+  .hs-sheet {
+    background: var(--color-paper-shade);
+    transform: rotate(3deg);
+    border-radius: 6px;
+  }
+
+  .hs-doc {
+    background: var(--color-paper);
+    color: var(--color-paper-ink);
+    border-radius: 6px;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+  }
+
+  .hs-doc-title {
+    font-family: var(--font-primary);
+    font-weight: 800;
+    font-stretch: 120%;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  .hs-doc-text {
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .hs-strong {
+    font-weight: 600;
+  }
+
+  .hs-bar {
+    background: #d2d2d7;
+  }
+
+  .hs-bar-dark {
+    background: #c7c7cc;
+  }
+
+  .hs-bar-light {
+    background: #e3e3e8;
+  }
+
+  .hs-rule {
+    background: #d2d2d7;
+  }
+
+  .hs-rule-dark {
+    background: var(--color-paper-ink);
+  }
+
+  /* everything on the 10s loop shares timing; each element picks its keyframes inline */
+  .hs-loop {
+    animation-duration: 10s;
+    animation-timing-function: var(--ease-out);
+    animation-iteration-count: infinite;
+  }
+
+  .hs-box {
+    border: 1.5px solid var(--color-accent-on-paper);
+    background: rgba(215, 242, 90, 0.35);
+  }
+
+  .hs-box-soft {
+    background: rgba(215, 242, 90, 0.16);
+  }
+
+  .hs-box-label {
+    position: absolute;
+    left: -1.5px;
+    padding: 0.1em 0.5em;
+    background: var(--color-accent-on-paper);
+    color: var(--color-paper);
+    letter-spacing: 0.06em;
+    line-height: 1.3;
+    white-space: nowrap;
+  }
+
+  @keyframes hs-scan {
+    0% { transform: translateY(0); opacity: 0; }
+    2% { opacity: 1; }
+    34% { transform: translateY(71.5cqw); opacity: 1; }
+    37%, 100% { transform: translateY(71.5cqw); opacity: 0; }
+  }
+
+  .hs-scan {
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 2px;
+    background: #9bbf00;
+    box-shadow: 0 0 18px 4px rgba(155, 191, 0, 0.45);
+    opacity: 0;
+    animation: hs-scan 10s linear infinite;
+  }
+
+  .hs-wires {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .hs-wires path {
+    stroke: var(--color-accent-on-paper);
+    stroke-width: 1.2;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .hs-panel {
+    background: var(--color-bg);
+    border-radius: 2.4cqw;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+
+  .hs-panel-head {
+    line-height: 1.6;
+    display: flex;
+    justify-content: space-between;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .hs-field {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 1.35;
+  }
+
+  .hs-key {
+    color: var(--color-text-muted);
+  }
+
+  .hs-value {
+    color: var(--color-text);
+    white-space: nowrap;
+  }
+
+  .hs-accent {
+    color: var(--color-accent-on-paper);
+    font-weight: 600;
+  }
+
+  .hs-steps {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hs-step {
+    display: flex;
+    align-items: center;
+    border-radius: 999px;
+    background: var(--color-bg);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
+    color: var(--color-text);
+    white-space: nowrap;
+  }
+
+  .hs-step svg {
+    color: var(--color-accent-on-paper);
+    flex-shrink: 0;
+  }
+
+  .hs-step-final {
+    background: var(--color-mark);
+    color: var(--color-mark-ink);
+    font-weight: 600;
+  }
+
+  .hs-step-final svg {
+    color: var(--color-mark-ink);
+  }
+</style>

@@ -1,0 +1,46 @@
+---
+title: "Boring on purpose: idempotency, error taxonomies and correlation IDs"
+description: "The three habits from my RPA years that I carry into every system I build."
+publishDate: 2026-09-13
+category: "Design concepts"
+tags: ["systems design", "reliability", "idempotency", "logging"]
+draft: false
+---
+
+I spent three years delivering UiPath automations for enterprise clients before moving to full-stack and AI work. RPA has a reputation for being fragile, and that is exactly why it was a good school: a robot clicking through someone else's system fails constantly, in public, at 3 a.m. You either learn to make failure boring or you don't sleep.
+
+Three habits came out of that. I now apply them to everything, from queue workers to LLM pipelines.
+
+## 1. Idempotency: make "again" safe
+
+Any step that can fail will be retried, by a queue, by a scheduler or by a person pressing the button twice. So the question for every operation with a side effect is: what happens if this runs again?
+
+The answer I want is "nothing new". In practice:
+
+- Give each unit of work a stable key derived from the business object (the invoice, the contract), not from the attempt.
+- Check-then-act against that key before creating anything: if the entry already exists, the step succeeded earlier and the job is done.
+- Record progress after each side effect, so a restart resumes instead of replaying.
+
+Once steps are idempotent, retries stop being dangerous, and that unlocks everything else. You can be aggressive about retrying precisely because a duplicate can't happen.
+
+## 2. An error taxonomy: decide the response before the failure
+
+"Something went wrong" is not actionable. Every failure in my systems is classified at the point where it's caught:
+
+- **Transient.** Timeouts, rate limits, a service restarting. Retry with backoff; no human needed.
+- **Permanent.** Invalid data, a missing record, a rejected payload. Retrying won't help. Stop, keep the context, send it to a person.
+- **Business exceptions.** The system worked; the case is outside the rules. Route it to whoever owns the rule.
+
+The value is in deciding this up front. When the taxonomy exists, the 3 a.m. behaviour is already designed: most failures heal themselves, and the ones that reach a person arrive with a reason and a next step.
+
+## 3. Correlation IDs: one thread through everything
+
+Every piece of work gets an ID when it enters the system, and that ID goes into every log line, every queue message and every outbound call made on its behalf. Logs are structured, so the ID is a field rather than a substring.
+
+This turns an investigation into a query. "What happened to this document?" returns one ordered story across every service it touched, instead of an afternoon of matching timestamps.
+
+## Why these three
+
+They reinforce each other. Idempotency makes retries safe. The taxonomy says when to retry. Correlation IDs show what the retries did. Together they're the difference between a system that needs its author and one that can be operated by anyone with the runbook.
+
+None of it is clever. That's the point.

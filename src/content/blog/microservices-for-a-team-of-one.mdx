@@ -1,0 +1,41 @@
+---
+title: "Microservices for a team of one: where I draw the boundaries"
+description: "When a separate service earns its operational cost, and when it's just a folder."
+publishDate: 2026-09-15
+category: "Architecture"
+tags: ["microservices", "architecture", "systems design"]
+draft: false
+---
+
+Most microservice advice assumes the problem is coordinating many teams. I don't have that problem. I own the systems I build on my own, so every service I split off is another pipeline, another set of logs and another thing to be paged about, all landing on the same person.
+
+That changes the question. It isn't "should this be a microservice?" It's "does this boundary pay for itself?"
+
+## A service has to earn its deployment
+
+I split something out only when at least one of these is true:
+
+- **It scales differently.** OCR and extraction are bursty and heavy. The web app is steady and light. Putting them in one process means sizing everything for the worst case.
+- **It fails differently.** A third-party API going down shouldn't take the approval screen with it. A boundary with a queue in the middle lets one side be broken while the other keeps working.
+- **It changes differently.** The part that talks to the ERP moves when the ERP does. Isolating it keeps that churn out of everything else.
+- **It needs different permissions.** The component that can post to the ledger should be small, boring and the only thing holding that credential.
+
+If none of those apply, it's a module. A folder with a clean interface gives most of the design benefit with none of the operational bill.
+
+## Queues over calls
+
+When I do split, the services talk through queues far more often than through HTTP. A synchronous call chain is a distributed monolith: every service has to be up for anything to work. With a queue between them, each stage can retry, slow down or be redeployed on its own, and the backlog is visible as a number.
+
+It also forces the discipline that makes the system reliable anyway: messages that can be processed twice without damage, and a correlation ID that follows the work through every hop.
+
+## One contract, written down
+
+The cost of a boundary is the contract across it. I keep those explicit and versioned: a schema for every message, validated on the way in. When a consumer rejects a message, that's a permanent error with a clear reason rather than a mystery three stages later.
+
+## What stays together
+
+Things that are always deployed together, always fail together and are only understood together belong in one service. For a document pipeline, that tends to give a small number of services with obvious names: ingestion, extraction, the web app and the integration that books the result. Four things I can hold in my head is better than fifteen I can't.
+
+## The test I use
+
+Before adding a service I ask what I'll do at the moment it breaks. If the answer is "the same thing I'd do if it were a module, but with more dashboards", it stays a module.

@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection, render } from 'astro:content';
+import SystemDiagram from '../../components/projects/SystemDiagram.astro';
+import { diagrams } from '../../data/diagrams';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
@@ -12,6 +14,7 @@ export async function getStaticPaths() {
 
 const { project } = Astro.props;
 const { Content } = await render(project);
+const diagram = diagrams[project.id];
 
 const formattedDate = new Intl.DateTimeFormat('en-US', {
   year: 'numeric',
@@ -23,7 +26,7 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
   <article class="container project-page animate-fade-in">
     <header class="project-header">
       <a href="/projects" class="back-link">← back to projects</a>
-      <h1 class="project-title">{project.data.title}</h1>
+      <h1 class="project-title" transition:name={`project-${project.id}`}>{project.data.title}</h1>
       <p class="project-description">{project.data.description}</p>
       {project.data.outcome && <p class="project-outcome"><span>Outcome:</span> {project.data.outcome}</p>}
       
@@ -55,6 +58,8 @@ const formattedDate = new Intl.DateTimeFormat('en-US', {
       </div>
     )}
     
+    {diagram && <SystemDiagram name={project.id} diagram={diagram} />}
+
     <div class="project-content prose">
       <Content />
     </div>
